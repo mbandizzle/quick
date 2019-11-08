@@ -6,7 +6,12 @@ component extends="quick.models.Relationships.BaseRelationship" {
 
         variables.child = arguments.parent;
 
-        super.init( related, relationName, relationMethodName, parent );
+        return super.init(
+            arguments.related,
+            arguments.relationName,
+            arguments.relationMethodName,
+            arguments.parent
+        );
     }
 
     function getResults() {
@@ -27,52 +32,54 @@ component extends="quick.models.Relationships.BaseRelationship" {
 
     function addEagerConstraints( entities ) {
         var key = variables.related.get_Table() & "." & variables.ownerKey;
-        variables.related.whereIn( key, getEagerEntityKeys( entities ) );
+        variables.related.whereIn( key, variables.getEagerEntityKeys( arguments.entities ) );
     }
 
     function getEagerEntityKeys( entities ) {
-        return entities.reduce( function( keys, entity ) {
-            if ( ! isNull( entity.retrieveAttribute( variables.foreignKey ) ) ) {
-                var key = entity.retrieveAttribute( variables.foreignKey );
+        return arguments.entities.reduce( function( keys, entity ) {
+            if ( ! isNull( arguments.entity.retrieveAttribute( variables.foreignKey ) ) ) {
+                var key = arguments.entity.retrieveAttribute( variables.foreignKey );
                 if ( key != "" ) {
-                    keys[ key ] = {};
+                    arguments.keys.append( key );
                 }
             }
-            return keys;
-        }, {} ).keyArray();
+            return arguments.keys;
+        }, [] );
     }
 
     function initRelation( entities, relation ) {
-        entities.each( function( entity ) {
-            entity.assignRelationship( relation, javacast( "null", "" ) );
-        } );
-        return entities;
+        for ( var entity in arguments.entities ) {
+            entity.assignRelationship( arguments.relation, javacast( "null", "" ) );
+        }
+        return arguments.entities;
     }
 
     function match( entities, results, relation ) {
-        var dictionary = results.reduce( function( dict, result ) {
-            dict[ result.retrieveAttribute( variables.ownerKey ) ] = result;
-            return dict;
+        var dictionary = arguments.results.reduce( function( dict, result ) {
+            arguments.dict[ arguments.result.retrieveAttribute( variables.ownerKey ) ] = arguments.result;
+            return arguments.dict;
         }, {} );
 
-        entities.each( function( entity ) {
+        for ( var entity in arguments.entities ) {
             if ( structKeyExists( dictionary, entity.retrieveAttribute( variables.foreignKey ) ) ) {
-                entity.assignRelationship( relation, dictionary[ entity.retrieveAttribute( variables.foreignKey ) ] );
+                entity.assignRelationship( arguments.relation, dictionary[ entity.retrieveAttribute( variables.foreignKey ) ] );
             }
-        } );
+        }
 
-        return entities;
+        return arguments.entities;
     }
 
     function applySetter() {
-        return associate( argumentCollection = arguments );
+        return variables.associate( argumentCollection = arguments );
     }
 
     function associate( entity ) {
-        var ownerKeyValue = isSimpleValue( entity ) ? entity : entity.retrieveAttribute( variables.ownerKey );
+        var ownerKeyValue = isSimpleValue( arguments.entity ) ?
+            arguments.entity :
+            arguments.entity.retrieveAttribute( variables.ownerKey );
         variables.child.forceAssignAttribute( variables.foreignKey, ownerKeyValue );
-        if ( ! isSimpleValue( entity ) ) {
-            variables.child.assignRelationship( variables.relationMethodName, entity );
+        if ( ! isSimpleValue( arguments.entity ) ) {
+            variables.child.assignRelationship( variables.relationMethodName, arguments.entity );
         }
         return variables.child;
     }

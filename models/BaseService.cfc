@@ -10,12 +10,16 @@ component {
 
     function onDIComplete() {
         if ( isSimpleValue( variables.entity ) ) {
-            variables.entity = wirebox.getInstance( variables.entity );
+            variables.entity = variables.wirebox.getInstance( variables.entity );
         }
     }
 
     function onMissingMethod( missingMethodName, missingMethodArguments ) {
-        return invoke( variables.entity.resetQuery(), missingMethodName, missingMethodArguments );
+        return invoke(
+            variables.entity.resetQuery(),
+            arguments.missingMethodName,
+            arguments.missingMethodArguments
+        );
     }
 
 }

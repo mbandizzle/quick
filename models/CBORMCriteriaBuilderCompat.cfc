@@ -10,133 +10,173 @@ component accessors="true" {
     }
 
     function getSQL() {
-        return getEntity().retrieveQuery().toSQL();
+        return variables.entity.retrieveQuery().toSQL();
     }
 
     function between( column, start, end ) {
-        getEntity().retrieveQuery().whereBetween( column, start, end );
+        variables.entity
+            .retrieveQuery()
+            .whereBetween( arguments.column, arguments.start, arguments.end );
         return this;
     }
 
     function eqProperty( left, right ) {
-        getEntity().retrieveQuery().whereColumn( left, right );
+        variables.entity
+            .retrieveQuery()
+            .whereColumn( arguments.left, arguments.right );
         return this;
     }
 
     function isEQ( column, value ) {
-        getEntity().retrieveQuery().where( column, "=", value );
+        variables.entity
+            .retrieveQuery()
+            .where( arguments.column, "=", arguments.value );
         return this;
     }
 
     function isGT( column, value ) {
-        getEntity().retrieveQuery().where( column, ">", value );
+        variables.entity
+            .retrieveQuery()
+            .where( arguments.column, ">", arguments.value );
         return this;
     }
 
     function gtProperty( left, right ) {
-        getEntity().retrieveQuery().whereColumn( left, ">", right );
+        variables.entity
+            .retrieveQuery()
+            .whereColumn( arguments.left, ">", arguments.right );
         return this;
     }
 
     function isGE( column, value ) {
-        getEntity().retrieveQuery().where( column, ">=", value );
+        variables.entity
+            .retrieveQuery()
+            .where( arguments.column, ">=", arguments.value );
         return this;
     }
 
     function geProperty( left, right ) {
-        getEntity().retrieveQuery().whereColumn( left, ">=", right );
+        variables.entity
+            .retrieveQuery()
+            .whereColumn( arguments.left, ">=", arguments.right );
         return this;
     }
 
     function idEQ( id ) {
-        getEntity().retrieveQuery().where( getEntity().get_key(), id );
+        variables.entity
+            .retrieveQuery()
+            .where( variables.entity.get_key(), arguments.id );
         return this;
     }
 
     function like( column, value ) {
-        getEntity().retrieveQuery().where( column, "like", value );
+        variables.entity
+            .retrieveQuery()
+            .where( arguments.column, "like", arguments.value );
         return this;
     }
 
     function ilike( column, value ) {
-        getEntity().retrieveQuery().where( column, "ilike", value );
+        variables.entity
+            .retrieveQuery()
+            .where( arguments.column, "ilike", arguments.value );
         return this;
     }
 
     function isIn( column, values ) {
-        getEntity().retrieveQuery().whereIn( column, values );
+        variables.entity
+            .retrieveQuery()
+            .whereIn( arguments.column, arguments.values );
         return this;
     }
 
     function isNull( column ) {
-        getEntity().retrieveQuery().whereNull( column );
+        variables.entity.retrieveQuery().whereNull( column );
         return this;
     }
 
     function isNotNull( column ) {
-        getEntity().retrieveQuery().whereNotNull( column );
+        variables.entity
+            .retrieveQuery()
+            .whereNotNull( arguments.column );
         return this;
     }
 
     function isLT( column, value ) {
-        getEntity().retrieveQuery().where( column, "<", value );
+        variables.entity
+            .retrieveQuery()
+            .where( arguments.column, "<", arguments.value );
         return this;
     }
 
     function ltProperty( left, right ) {
-        getEntity().retrieveQuery().whereColumn( left, "<", right );
+        variables.entity
+            .retrieveQuery()
+            .whereColumn( arguments.left, "<", arguments.right );
         return this;
     }
 
     function neProperty( left, right ) {
-        getEntity().retrieveQuery().whereColumn( left, "<>", right );
+        variables.entity
+            .retrieveQuery()
+            .whereColumn( arguments.left, "<>", arguments.right );
         return this;
     }
 
     function isLE( column, value ) {
-        getEntity().retrieveQuery().where( column, "<=", value );
+        variables.entity
+            .retrieveQuery()
+            .where( arguments.column, "<=", arguments.value );
         return this;
     }
 
     function leProperty( left, right ) {
-        getEntity().retrieveQuery().whereColumn( left, "<=", right );
+        variables.entity
+            .retrieveQuery()
+            .whereColumn( arguments.left, "<=", arguments.right );
         return this;
     }
 
     function maxResults( max ) {
-        getEntity().retrieveQuery().limit( max );
+        variables.entity
+            .retrieveQuery()
+            .limit( arguments.max );
         return this;
     }
 
     function firstResult( offset ) {
-        getEntity().retrieveQuery().offset( offset );
+        variables.entity
+            .retrieveQuery()
+            .offset( arguments.offset );
         return this;
     }
 
     function order( orders ) {
-        arguments.orders = isArray( arguments.orders ) ? arguments.orders : listToArray( arguments.orders, "," );
-        getEntity().retrieveQuery().orderBy(
+        arguments.orders = isArray( arguments.orders ) ?
+            arguments.orders :
+            listToArray( arguments.orders, "," );
+        variables.entity.retrieveQuery().orderBy(
             arguments.orders.map( function( order ) {
-                return replace( order, " ", "|" );
+                return replace( arguments.order, " ", "|" );
             } )
         );
         return this;
     }
 
     function list() {
-        return getEntity().getAll();
+        return variables.entity.getAll();
     }
 
     function get() {
-        return getEntity().first();
+        return variables.entity.first();
     }
 
     function count() {
-        return getEntity().count();
+        return variables.entity.count();
     }
 
     function onMissingMethod( missingMethodName, missingMethodArguments ) {
-        invoke( variables.query, missingMethodName, missingMethodArguments );
+        invoke( variables.query, arguments.missingMethodName, arguments.missingMethodArguments );
         return this;
     }
 

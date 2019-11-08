@@ -11,20 +11,23 @@ component extends="quick.models.BaseEntity" {
         boolean ignoreCase,
         boolean asQuery = true
     ) {
-        structEach( criteria, function( key, value ) {
-            retrieveQuery().where( retrieveColumnForAlias( key ), value );
+        structEach( arguments.criteria, function( key, value ) {
+            variables.retrieveQuery().where(
+                variables.retrieveColumnForAlias( arguments.key ),
+                arguments.value
+            );
         } );
-        if ( ! isNull( sortOrder ) ) {
-            retrieveQuery().orderBy( sortOrder );
+        if ( ! isNull( arguments.sortOrder ) ) {
+            variables.retrieveQuery().orderBy( arguments.sortOrder );
         }
-        if ( ! isNull( offset ) && offset > 0 ) {
-            retrieveQuery().offset( offset );
+        if ( ! isNull( arguments.offset ) && arguments.offset > 0 ) {
+            variables.retrieveQuery().offset( arguments.offset );
         }
-        if ( ! isNull( max ) && max > 0 ) {
-            retrieveQuery().limit( max );
+        if ( ! isNull( arguments.max ) && arguments.max > 0 ) {
+            variables.retrieveQuery().limit( arguments.max );
         }
-        if ( asQuery ) {
-            return retrieveQuery().setReturnFormat( "query" ).get();
+        if ( arguments.asQuery ) {
+            return variables.retrieveQuery().setReturnFormat( "query" ).get();
         } else {
             return super.get();
         }
@@ -32,98 +35,110 @@ component extends="quick.models.BaseEntity" {
 
     function countWhere() {
         for ( var key in arguments ) {
-            retrieveQuery().where( retrieveColumnForAlias( key ), arguments[ key ] );
+            variables.retrieveQuery().where(
+                variables.retrieveColumnForAlias( key ),
+                arguments[ key ]
+            );
         }
-        return retrieveQuery().count();
+        return variables.retrieveQuery().count();
     }
 
     function deleteById( id ) {
         arguments.id = isArray( arguments.id ) ? arguments.id : [ arguments.id ];
-        retrieveQuery().whereIn( get_key(), arguments.id ).delete();
+        variables.retrieveQuery().whereIn( get_key(), arguments.id ).delete();
         return this;
     }
 
     function deleteWhere() {
         for ( var key in arguments ) {
-            retrieveQuery().where( retrieveColumnForAlias( key ), arguments[ key ] );
+            variables.retrieveQuery().where(
+                variables.retrieveColumnForAlias( key ),
+                arguments[ key ]
+            );
         }
-        return deleteAll();
+        return super.deleteAll();
     }
 
     function exists( id ) {
-        if ( ! isNull( id ) ) {
-            retrieveQuery().where( get_key(), arguments.id );
+        if ( ! isNull( arguments.id ) ) {
+            variables.retrieveQuery().where( get_key(), arguments.id );
         }
-        return retrieveQuery().exists();
+        return variables.retrieveQuery().exists();
     }
 
     function findAllWhere( criteria = {}, sortOrder ) {
-        structEach( criteria, function( key, value ) {
-            retrieveQuery().where( retrieveColumnForAlias( key ), value );
+        structEach( arguments.criteria, function( key, value ) {
+            variables.retrieveQuery().where(
+                variables.retrieveColumnForAlias( arguments.key ),
+                arguments.value
+            );
         } );
-        if ( ! isNull( sortOrder ) ) {
-            var sorts = listToArray( sortOrder, "," ).map( function( sort ) {
-                return replace( sort, " ", "|", "ALL" );
+        if ( ! isNull( arguments.sortOrder ) ) {
+            var sorts = listToArray( arguments.sortOrder, "," ).map( function( sort ) {
+                return replace( arguments.sort, " ", "|", "ALL" );
             } );
-            retrieveQuery().orderBy( sorts );
+            variables.retrieveQuery().orderBy( sorts );
         }
         return super.get();
     }
 
     function findWhere( criteria = {} ) {
-        structEach( criteria, function( key, value ) {
-            retrieveQuery().where( retrieveColumnForAlias( key ), value );
+        structEach( arguments.criteria, function( key, value ) {
+            variables.retrieveQuery().where(
+                variables.retrieveColumnForAlias( arguments.key ),
+                arguments.value
+            );
         } );
-        return first();
+        return super.first();
     }
 
     function get( id = 0, returnNew = true ) {
         if ( ( isNull( arguments.id ) || arguments.id == 0 ) && arguments.returnNew ) {
-            return newEntity();
+            return super.newEntity();
         }
         return invoke( this, "find", { id = arguments.id } );
     }
 
     function getAll( id, sortOrder ) {
-        if ( isNull( id ) ) {
-            if ( ! isNull( sortOrder ) ) {
-                var sorts = listToArray( sortOrder, "," ).map( function( sort ) {
-                    return replace( sort, " ", "|", "ALL" );
+        if ( isNull( arguments.id ) ) {
+            if ( ! isNull( arguments.sortOrder ) ) {
+                var sorts = listToArray( arguments.sortOrder, "," ).map( function( sort ) {
+                    return replace( arguments.sort, " ", "|", "ALL" );
                 } );
-                retrieveQuery().orderBy( sorts );
+                variables.retrieveQuery().orderBy( sorts );
             }
             return super.get();
         }
-        var ids = isArray( id ) ? id : listToArray( id, "," );
-        retrieveQuery().whereIn( get_key(), ids );
+        var ids = isArray( arguments.id ) ? arguments.id : listToArray( arguments.id, "," );
+        variables.retrieveQuery().whereIn( get_key(), ids );
         return super.get();
     }
 
     function new( properties = {} ) {
-        return newEntity().fill( properties );
+        return super.newEntity().fill( arguments.properties );
     }
 
     function populate( properties = {} ) {
-        super.fill( properties );
+        super.fill( arguments.properties );
         return this;
     }
 
     function save( entity ) {
-        if ( isNull( entity ) ) {
+        if ( isNull( arguments.entity ) ) {
             return super.save();
         }
-        return entity.save();
+        return arguments.entity.save();
     }
 
     function saveAll( entities = [] ) {
-        entities.each( function( entity ) {
-            entity.save();
+        arguments.entities.each( function( entity ) {
+            arguments.entity.save();
         } );
         return this;
     }
 
     function newCriteria() {
-        return CBORMCriteriaBuilderCompat.get()
+        return variables.CBORMCriteriaBuilderCompat.get()
             .setEntity( this );
     }
 

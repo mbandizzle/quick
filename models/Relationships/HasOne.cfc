@@ -5,9 +5,9 @@ component extends="quick.models.Relationships.HasOneOrMany" {
     }
 
     function initRelation( entities, relation ) {
-        entities.each( function( entity ) {
-            entity.assignRelationship( relation, javacast( "null", "" ) );
-        } );
+        for ( var entity in arguments.entities ) {
+            entity.assignRelationship( arguments.relation, javacast( "null", "" ) );
+        }
         return entities;
     }
 

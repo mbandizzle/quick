@@ -8,7 +8,7 @@ component {
         variables.relationMethodName = arguments.relationMethodName;
         variables.parent = arguments.parent;
 
-        addConstraints();
+        variables.addConstraints();
 
         return this;
     }
@@ -48,17 +48,23 @@ component {
     */
 
     function get() {
-        return getResults();
+        return variables.getResults();
     }
 
     function getKeys( entities, key ) {
-        return unique( entities.map( function( entity ) {
-            return entity.retrieveAttribute( key );
-        } ) );
+        var keys = [];
+        for ( var entity in arguments.entities ) {
+            keys.append( entity.retrieveAttribute( arguments.key ) );
+        }
+        return unique( keys );
     }
 
     function onMissingMethod( missingMethodName, missingMethodArguments ) {
-        var result = invoke( variables.related, missingMethodName, missingMethodArguments );
+        var result = invoke(
+            variables.related,
+            arguments.missingMethodName,
+            arguments.missingMethodArguments
+        );
         if ( isSimpleValue( result ) ) {
             return result;
         }
@@ -66,7 +72,7 @@ component {
     }
 
     function unique( items ) {
-        return arraySlice( createObject( "java", "java.util.HashSet" ).init( items ).toArray(), 1 );
+        return arraySlice( createObject( "java", "java.util.HashSet" ).init( arguments.items ).toArray(), 1 );
     }
 
 }

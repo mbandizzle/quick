@@ -17,7 +17,12 @@ component accessors="true" extends="quick.models.Relationships.BaseRelationship"
         variables.relatedPivotKey = arguments.relatedPivotKey;
         variables.foreignPivotKey = arguments.foreignPivotKey;
 
-        super.init( related, relationName, relationMethodName, parent );
+        return super.init(
+            arguments.related,
+            arguments.relationName,
+            arguments.relationMethodName,
+            arguments.parent
+        );
     }
 
     function getResults() {
@@ -25,8 +30,8 @@ component accessors="true" extends="quick.models.Relationships.BaseRelationship"
     }
 
     function addConstraints() {
-        performJoin();
-        addWhereConstraints();
+        variables.performJoin();
+        variables.addWhereConstraints();
     }
 
     function addEagerConstraints( entities ) {
@@ -34,51 +39,56 @@ component accessors="true" extends="quick.models.Relationships.BaseRelationship"
             .from( variables.table )
             .whereIn(
                 getQualifiedForeignPivotKeyName(),
-                getKeys( entities, variables.parentKey )
+                getKeys( arguments.entities, variables.parentKey )
             );
     }
 
     function initRelation( entities, relation ) {
-        entities.each( function( entity ) {
-            entity.assignRelationship( relation, [] );
-        } );
-        return entities;
+        for ( var entity in arguments.entities ) {
+            entity.assignRelationship( arguments.relation, [] );
+        }
+        return arguments.entities;
     }
 
     function match( entities, results, relation ) {
-        var dictionary = buildDictionary( results );
-        entities.each( function( entity ) {
+        var dictionary = buildDictionary( arguments.results );
+        for ( var entity in arguments.entities ) {
             if ( structKeyExists( dictionary, entity.retrieveAttribute( variables.parentKey ) ) ) {
                 entity.assignRelationship(
-                    relation,
+                    arguments.relation,
                     dictionary[ entity.retrieveAttribute( variables.parentKey ) ]
                 );
             }
-        } );
-        return entities;
+        }
+        return arguments.entities;
     }
 
     function buildDictionary( results ) {
-        return results.reduce( function( dict, result ) {
-            var key = result.retrieveAttribute( variables.foreignPivotKey );
-            if ( ! structKeyExists( dict, key ) ) {
-                dict[ key ] = [];
+        return arguments.results.reduce( function( dict, result ) {
+            var key = arguments.result.retrieveAttribute( variables.foreignPivotKey );
+            if ( ! structKeyExists( arguments.dict, key ) ) {
+                arguments.dict[ key ] = [];
             }
-            arrayAppend( dict[ key ], result );
-            return dict;
+            arrayAppend( arguments.dict[ key ], arguments.result );
+            return arguments.dict;
         }, {} );
     }
 
     function performJoin() {
         var baseTable = variables.related.get_table();
         var key = baseTable & "." & variables.relatedKey;
-        variables.related.join( variables.table, key, "=", getQualifiedRelatedPivotKeyName() );
+        variables.related.join(
+            variables.table,
+            key,
+            "=",
+            variables.getQualifiedRelatedPivotKeyName()
+        );
         return this;
     }
 
     function addWhereConstraints() {
         variables.related.where(
-            getQualifiedForeignPivotKeyName(),
+            variables.getQualifiedForeignPivotKeyName(),
             "=",
             variables.parent.retrieveAttribute( variables.parentKey )
         );
@@ -94,27 +104,30 @@ component accessors="true" extends="quick.models.Relationships.BaseRelationship"
     }
 
     function attach( id ) {
-        newPivotStatement().insert( parseIdsForInsert( id ) );
+        variables.newPivotStatement()
+            .insert( variables.parseIdsForInsert( arguments.id ) );
     }
 
     function detach( id ) {
         var foreignPivotKeyValue = variables.parent.retrieveAttribute( variables.parentKey );
-        newPivotStatement()
+        variables.newPivotStatement()
             .where( variables.foreignPivotKey, "=", foreignPivotKeyValue )
             .whereIn(
                 variables.relatedPivotKey,
-                parseIds( id )
+                variables.parseIds( arguments.id )
             ).delete();
     }
 
     function applySetter() {
-        return sync( argumentCollection = arguments );
+        return variables.sync( argumentCollection = arguments );
     }
 
     function sync( id ) {
         var foreignPivotKeyValue = variables.parent.retrieveAttribute( variables.parentKey );
-        newPivotStatement().where( variables.foreignPivotKey, "=", foreignPivotKeyValue ).delete();
-        attach( id );
+        variables.newPivotStatement()
+            .where( variables.foreignPivotKey, "=", foreignPivotKeyValue )
+            .delete();
+        variables.attach( id );
         return variables.parent;
     }
 
@@ -123,25 +136,25 @@ component accessors="true" extends="quick.models.Relationships.BaseRelationship"
     }
 
     function parseIds( value ) {
-        arguments.value = isArray( value ) ? value : [ value ];
+        arguments.value = isArray( arguments.value ) ? arguments.value : [ arguments.value ];
         return arguments.value.map( function( val ) {
             // If the value is not a simple value, we will assume
             // it is an entity and return its key value.
-            if ( ! isSimpleValue( val ) ) {
-                return val.keyValue();
+            if ( ! isSimpleValue( arguments.val ) ) {
+                return arguments.val.keyValue();
             }
-            return val;
+            return arguments.val;
         } );
     }
 
     function parseIdsForInsert( value ) {
         var foreignPivotKeyValue = variables.parent.retrieveAttribute( variables.parentKey );
-        arguments.value = isArray( value ) ? value : [ value ];
+        arguments.value = isArray( arguments.value ) ? arguments.value : [ arguments.value ];
         return arguments.value.map( function( val ) {
             // If the value is not a simple value, we will assume
             // it is an entity and return its key value.
-            if ( ! isSimpleValue( val ) ) {
-                arguments.val = val.keyValue();
+            if ( ! isSimpleValue( arguments.val ) ) {
+                arguments.val = arguments.val.keyValue();
             }
             var insertRecord = {};
             insertRecord[ variables.foreignPivotKey ] = foreignPivotKeyValue;

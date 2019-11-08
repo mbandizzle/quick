@@ -5,14 +5,18 @@ component extends="quick.models.Relationships.PolymorphicHasOneOrMany" {
     }
 
     function initRelation( entities, relation ) {
-        entities.each( function( entity ) {
-            entity.assignRelationship( relation, [] );
-        } );
-        return entities;
+        for ( var entity in arguments.entities ) {
+            entity.assignRelationship( arguments.relation, [] );
+        }
+        return arguments.entities;
     }
 
     function match( entities, results, relation ) {
-        return matchMany( entities, results, relation );
+        return matchMany(
+            arguments.entities,
+            arguments.results,
+            arguments.relation
+        );
     }
 
 }

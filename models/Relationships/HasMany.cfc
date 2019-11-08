@@ -5,10 +5,10 @@ component extends="quick.models.Relationships.HasOneOrMany" {
     }
 
     function initRelation( entities, relation ) {
-        entities.each( function( entity ) {
-            entity.assignRelationship( relation, [] );
-        } );
-        return entities;
+        for ( var entity in arguments.entities ) {
+            entity.assignRelationship( arguments.relation, [] );
+        }
+        return arguments.entities;
     }
 
     function match( entities, results, relation ) {

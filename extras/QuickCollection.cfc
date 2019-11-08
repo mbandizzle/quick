@@ -1,7 +1,7 @@
 component extends="cfcollection.models.Collection" {
 
     function collect( data ) {
-        return new QuickCollection( data );
+        return new QuickCollection( arguments.data );
     }
 
     function load( relationName ) {
@@ -9,12 +9,12 @@ component extends="cfcollection.models.Collection" {
             return this;
         }
 
-        if ( ! isArray( relationName ) ) {
-            relationName = [ relationName ];
+        if ( ! isArray( arguments.relationName ) ) {
+            arguments.relationName = [ arguments.relationName ];
         }
 
-        for ( var relation in relationName ) {
-            eagerLoadRelation( relation );
+        for ( var relation in arguments.relationName ) {
+            variables.eagerLoadRelation( relation );
         }
 
         return this;
@@ -22,21 +22,21 @@ component extends="cfcollection.models.Collection" {
 
     function getMemento() {
         return this.map( function( entity ) {
-            return entity.$renderData();
+            return arguments.entity.$renderData();
         } ).get();
     }
 
     function $renderData() {
-        return getMemento();
+        return variables.getMemento();
     }
 
     private function eagerLoadRelation( relationName ) {
-        var relation = invoke( get( 1 ), relationName ).resetQuery();
-        relation.addEagerConstraints( get() );
+        var relation = invoke( variables.get( 1 ), arguments.relationName ).resetQuery();
+        relation.addEagerConstraints( variables.get() );
         variables.collection = relation.match(
-            relation.initRelation( get(), relationName ),
+            relation.initRelation( variables.get(), arguments.relationName ),
             relation.getEager(),
-            relationName
+            arguments.relationName
         );
     }
 

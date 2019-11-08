@@ -4,18 +4,24 @@ component extends="quick.models.Relationships.BaseRelationship" accessors="true"
         variables.localKey = arguments.localKey;
         variables.foreignKey = arguments.foreignKey;
 
-        return super.init( related, relationName, relationMethodName, parent );
+        return super.init(
+            arguments.related,
+            arguments.relationName,
+            arguments.relationMethodName,
+            arguments.parent
+        );
     }
 
     function addConstraints() {
         variables.related.retrieveQuery()
-            .where( variables.foreignKey, "=", getParentKey() )
+            .where( variables.foreignKey, "=", variables.getParentKey() )
             .whereNotNull( variables.foreignKey );
     }
 
     function addEagerConstraints( entities ) {
         variables.related.retrieveQuery().whereIn(
-            variables.foreignKey, getKeys( entities, variables.localKey )
+            variables.foreignKey,
+            variables.getKeys( arguments.entities, variables.localKey )
         );
     }
 
@@ -30,33 +36,33 @@ component extends="quick.models.Relationships.BaseRelationship" accessors="true"
     }
 
     function matchOneOrMany( entities, results, relation, type ) {
-        var dictionary = buildDictionary( results );
-        entities.each( function( entity ) {
+        var dictionary = buildDictionary( arguments.results );
+        for ( var entity in arguments.entities ) {
             var key = entity.retrieveAttribute( variables.localKey );
             if ( structKeyExists( dictionary, key ) ) {
                 entity.assignRelationship(
-                    relation,
-                    getRelationValue( dictionary, key, type )
+                    arguments.relation,
+                    variables.getRelationValue( dictionary, key, arguments.type )
                 );
             }
-        } );
-        return entities;
+        }
+        return arguments.entities;
     }
 
     function buildDictionary( results ) {
-        return results.reduce( function( dict, result ) {
-            var key = result.retrieveAttribute( variables.foreignKey );
-            if ( ! structKeyExists( dict, key ) ) {
-                dict[ key ] = [];
+        return arguments.results.reduce( function( dict, result ) {
+            var key = arguments.result.retrieveAttribute( variables.foreignKey );
+            if ( ! structKeyExists( arguments.dict, key ) ) {
+                arguments.dict[ key ] = [];
             }
-            arrayAppend( dict[ key ], result );
-            return dict;
+            arrayAppend( arguments.dict[ key ], arguments.result );
+            return arguments.dict;
         }, {} );
     }
 
     function getRelationValue( dictionary, key, type ) {
-        var value = dictionary[ key ];
-        return type == "one" ? value[ 1 ] : value;
+        var value = arguments.dictionary[ arguments.key ];
+        return arguments.type == "one" ? value[ 1 ] : value;
     }
 
     function getParentKey() {
@@ -70,45 +76,45 @@ component extends="quick.models.Relationships.BaseRelationship" accessors="true"
             },
             force = true
         );
-        return saveMany( argumentCollection = arguments );
+        return variables.saveMany( argumentCollection = arguments );
     }
 
     function saveMany( entities ) {
-        arguments.entities = isArray( entities ) ? entities : [ entities ];
-        return entities.map( function( entity ) {
-            return save( entity );
+        arguments.entities = isArray( arguments.entities ) ? arguments.entities : [ arguments.entities ];
+        return arguments.entities.map( function( entity ) {
+            return variables.save( arguments.entity );
         } );
     }
 
     function save( entity ) {
-        if ( isSimpleValue( entity ) ) {
-            entity = variables.related
+        if ( isSimpleValue( arguments.entity ) ) {
+            arguments.entity = variables.related
                 .newEntity()
                 .set_loaded( true )
                 .forceAssignAttribute(
                     variables.related.get_key(),
-                    entity
+                    arguments.entity
                 );
         }
-        setForeignAttributesForCreate( entity );
-        return entity.save();
+        variables.setForeignAttributesForCreate( arguments.entity );
+        return arguments.entity.save();
     }
 
     function create( attributes = {} ) {
-        var newInstance = variables.related.newEntity().fill( attributes );
-        setForeignAttributesForCreate( newInstance );
+        var newInstance = variables.related.newEntity().fill( arguments.attributes );
+        variables.setForeignAttributesForCreate( newInstance );
         return newInstance.save();
     }
 
     function setForeignAttributesForCreate( entity ) {
-        entity.forceAssignAttribute(
-            getForeignKeyName(),
-            getParentKey()
+        arguments.entity.forceAssignAttribute(
+            variables.getForeignKeyName(),
+            variables.getParentKey()
         );
     }
 
     function getForeignKeyName() {
-        var parts = listToArray( getQualifiedForeignKeyName(), "." );
+        var parts = listToArray( variables.getQualifiedForeignKeyName(), "." );
         return parts[ arrayLen( parts ) ];
     }
 

@@ -19,31 +19,36 @@ component accessors="true" extends="quick.models.Relationships.BaseRelationship"
         variables.localKey = arguments.localKey;
         variables.secondLocalKey = arguments.secondLocalKey;
 
-        super.init( related, relationName, relationMethodName, intermediate );
+        return super.init(
+            arguments.related,
+            arguments.relationName,
+            arguments.relationMethodName,
+            arguments.intermediate
+        );
     }
 
     function addConstraints() {
         var localValue = variables.farParent.retrieveAttribute( variables.localKey );
-        performJoin();
+        variables.performJoin();
         variables.related.where(
-            getQualifiedFirstKeyName(),
+            variables.getQualifiedFirstKeyName(),
             "=",
             localValue
         );
     }
 
     function performJoin() {
-        var farKey = getQualifiedFarKeyName();
+        var farKey = variables.getQualifiedFarKeyName();
         variables.related.join(
             variables.throughParent.get_Table(),
-            getQualifiedParentKeyName(),
+            variables.getQualifiedParentKeyName(),
             "=",
             farKey
         );
     }
 
     function getQualifiedFarKeyName() {
-        return getQualifiedForeignKeyName();
+        return variables.getQualifiedForeignKeyName();
     }
 
     function getQualifiedForeignKeyName() {
@@ -59,7 +64,7 @@ component accessors="true" extends="quick.models.Relationships.BaseRelationship"
     }
 
     function getResults() {
-        return this.get();
+        return variables.get();
     }
 
     function get() {
@@ -71,39 +76,39 @@ component accessors="true" extends="quick.models.Relationships.BaseRelationship"
     }
 
     function addEagerConstraints( entities ) {
-        performJoin();
+        variables.performJoin();
         variables.related.whereIn(
-            getQualifiedFirstKeyName(),
-            getKeys( entities, variables.localKey )
+            variables.getQualifiedFirstKeyName(),
+            variables.getKeys( arguments.entities, variables.localKey )
         );
     }
 
     function initRelation( entities, relation ) {
-        entities.each( function( entity ) {
-            entity.assignRelationship( relation, [] );
-        } );
-        return entities;
+        for ( var entity in arguments.entities ) {
+            entity.assignRelationship( arguments.relation, [] );
+        }
+        return arguments.entities;
     }
 
     function match( entities, results, relation ) {
-        var dictionary = buildDictionary( results );
-        entities.each( function( entity ) {
+        var dictionary = buildDictionary( arguments.results );
+        for ( var entity in arguments.entities ) {
             var key = entity.retrieveAttribute( variables.localKey );
             if ( structKeyExists( dictionary, key ) ) {
-                entity.assignRelationship( relation, dictionary[ key ] );
+                entity.assignRelationship( arguments.relation, dictionary[ key ] );
             }
-        } );
-        return entities;
+        }
+        return arguments.entities;
     }
 
     function buildDictionary( results ) {
-        return results.reduce( function( dict, result ) {
-            var key = result.retrieveAttribute( variables.firstKey );
-            if ( ! structKeyExists( dict, key ) ) {
-                dict[ key ] = [];
+        return arguments.results.reduce( function( dict, result ) {
+            var key = arguments.result.retrieveAttribute( variables.firstKey );
+            if ( ! structKeyExists( arguments.dict, key ) ) {
+                arguments.dict[ key ] = [];
             }
-            arrayAppend( dict[ key ], result );
-            return dict;
+            arrayAppend( arguments.dict[ key ], arguments.result );
+            return arguments.dict;
         }, {} );
     }
 
