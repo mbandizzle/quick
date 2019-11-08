@@ -7,11 +7,11 @@ component {
     this.cfmapping = "quick";
 
     function configure() {
-        settings = {
+        variables.settings = {
             defaultGrammar = "AutoDiscover"
         };
 
-        interceptorSettings = {
+        variables.interceptorSettings = {
             customInterceptionPoints = [
                 "quickInstanceReady",
                 "quickPreLoad",
@@ -27,24 +27,24 @@ component {
             ]
         };
 
-		interceptors = [
-			{ class="#moduleMapping#.interceptors.QuickVirtualInheritanceInterceptor" }
+		variables.interceptors = [
+			{ class="#variables.moduleMapping#.interceptors.QuickVirtualInheritanceInterceptor" }
         ];
 
-        binder.map( "quick.models.BaseEntity" )
-            .to( "#moduleMapping#.models.BaseEntity" );
+        variables.binder.map( "quick.models.BaseEntity" )
+            .to( "#variables.moduleMapping#.models.BaseEntity" );
 
-        binder.getInjector().registerDSL( "quickService", "#moduleMapping#.dsl.QuickServiceDSL" );
+        variables.binder.getInjector().registerDSL( "quickService", "#variables.moduleMapping#.dsl.QuickServiceDSL" );
 
         var creatorType = server.keyExists( "lucee" ) ? "LuceeEntityCreator" : "ACFEntityCreator";
-        binder.map( "EntityCreator@quick" )
-            .to( "#moduleMapping#.extras.#creatorType#" );
+        variables.binder.map( "EntityCreator@quick" )
+            .to( "#variables.moduleMapping#.extras.#creatorType#" );
     }
 
     function onLoad() {
-        binder.map( "QuickQB@quick" )
+        variables.binder.map( "QuickQB@quick" )
             .to( "qb.models.Query.QueryBuilder" )
-            .initArg( name = "grammar", dsl = "#settings.defaultGrammar#@qb" )
+            .initArg( name = "grammar", dsl = "#variables.settings.defaultGrammar#@qb" )
             .initArg( name = "utils", dsl = "QueryUtils@qb" )
             .initArg( name = "returnFormat", value = "array" );
     }

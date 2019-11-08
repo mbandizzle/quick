@@ -1,8 +1,8 @@
 component {
 
     function afterInstanceInspection( interceptData ) {
-        if ( interceptData.mapping.getObjectMetadata().keyExists( "quick" ) ) {
-            interceptData.mapping.setVirtualInheritance( "quick.models.BaseEntity" );
+        if ( arguments.interceptData.mapping.getObjectMetadata().keyExists( "quick" ) ) {
+            arguments.interceptData.mapping.setVirtualInheritance( "quick.models.BaseEntity" );
         }
     }
 

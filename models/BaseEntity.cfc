@@ -37,14 +37,14 @@ component accessors="true" {
     property name="_globalScopeExclusions" persistent="false";
 
     function init( struct meta = {} ) {
-        assignDefaultProperties();
+        variables.assignDefaultProperties();
         variables._meta = arguments.meta;
         return this;
     }
 
     function assignDefaultProperties() {
-        assignAttributesData( {} );
-        assignOriginalAttributes( {} );
+        variables.assignAttributesData( {} );
+        variables.assignOriginalAttributes( {} );
         variables._globalScopeExclusions = [];
         param variables._meta = {};
         param variables._data = {};
@@ -57,8 +57,8 @@ component accessors="true" {
     }
 
     function onDIComplete() {
-        metadataInspection();
-        fireEvent( "instanceReady", { entity = this } );
+        variables.metadataInspection();
+        variables.fireEvent( "instanceReady", { entity = this } );
     }
 
     function keyType() {
@@ -67,7 +67,7 @@ component accessors="true" {
 
     function retrieveKeyType() {
         if ( isNull( variables.__keyType__ ) ) {
-            variables.__keyType__ = keyType();
+            variables.__keyType__ = variables.keyType();
         }
         return variables.__keyType__;
     }
@@ -77,34 +77,36 @@ component accessors="true" {
     ==================================*/
 
     function keyValue() {
-        guardAgainstNotLoaded( "This instance is not loaded so the `keyValue` cannot be retrieved." );
-        return retrieveAttribute( variables._key );
+        variables.guardAgainstNotLoaded( "This instance is not loaded so the `keyValue` cannot be retrieved." );
+        return variables.retrieveAttribute( variables._key );
     }
 
     function retrieveAttributesData( aliased = false, withoutKey = false, withNulls = false ) {
         variables._attributes.keyArray().each( function( key ) {
-            if ( variables.keyExists( key ) && ! isReadOnlyAttribute( key ) ) {
-                assignAttribute( key, variables[ key ] );
+            if ( variables.keyExists( arguments.key ) && ! isReadOnlyAttribute( arguments.key ) ) {
+                assignAttribute( arguments.key, variables[ arguments.key ] );
             }
         } );
-        return variables._data.reduce( function( acc, key, value ) {
-            if ( withoutKey && key == variables._key ) {
-                return acc;
+        var data = {};
+        for ( var key in variables._data ) {
+            if ( arguments.withoutKey && variables._key == key ) {
+                continue;
             }
-            if ( isNull( value ) || ( isNullValue( key, value ) && withNulls ) ) {
-                acc[ aliased ? retrieveAliasForColumn( key ) : key ] = javacast( "null" , "" );
+            if ( isNull( variables._data[ key ] ) || ( isNullValue( key, variables._data[ key ] ) && arguments.withNulls ) ) {
+                data[ arguments.aliased ? variables.retrieveAliasForColumn( key ) : key ] = javacast( "null" , "" );
             } else {
-                acc[ aliased ? retrieveAliasForColumn( key ) : key ] = value;
+                data[ arguments.aliased ? retrieveAliasForColumn( key ) : key ] = variables._data[ key ];
             }
-            return acc;
-        }, {} );
+        }
+        return data;
     }
 
     function retrieveAttributeNames( columnNames = false ) {
-        return variables._attributes.reduce( function( items, key, value ) {
-            items.append( columnNames ? value : key );
-            return items;
-        }, [] );
+        var names = [];
+        for ( var key in variables._attributes ) {
+            names.append( arguments.columnNames ? variables._attributes[ key ] : key );
+        }
+        return names;
     }
 
     function forceClearAttribute( name, setToNull = false ) {
@@ -114,18 +116,18 @@ component accessors="true" {
 
     function clearAttribute( name, setToNull = false, force = false ) {
         if ( arguments.force ) {
-            if ( ! variables._attributes.keyExists( retrieveAliasForColumn( arguments.name ) ) ) {
+            if ( ! variables._attributes.keyExists( variables.retrieveAliasForColumn( arguments.name ) ) ) {
                 variables._attributes[ arguments.name ] = arguments.name;
-                variables._meta.properties[ arguments.name ] = paramProperty( { "name" = arguments.name } );
+                variables._meta.properties[ arguments.name ] = variables.paramProperty( { "name" = arguments.name } );
                 variables._meta.originalMetadata.properties.append( variables._meta.properties[ arguments.name ] );
             }
         }
         if ( arguments.setToNull ) {
             variables._data[ arguments.name ] = javacast( "null", "" );
-            variables[ retrieveAliasForColumn( arguments.name ) ] = javacast( "null", "" );
+            variables[ variables.retrieveAliasForColumn( arguments.name ) ] = javacast( "null", "" );
         } else {
             variables._data.delete( arguments.name );
-            variables.delete( retrieveAliasForColumn( arguments.name ) );
+            variables.delete( variables.retrieveAliasForColumn( arguments.name ) );
         }
         return this;
     }
@@ -138,11 +140,19 @@ component accessors="true" {
         }
 
         arguments.attrs.each( function( key, value ) {
-            if ( variables.keyExists( "set" & retrieveAliasForColumn( arguments.key ) ) ) {
-                invoke( this, "set" & retrieveAliasForColumn( arguments.key ), { 1 = arguments.value } );
+            if ( variables.keyExists( "set" & variables.retrieveAliasForColumn( arguments.key ) ) ) {
+                invoke(
+                    this,
+                    "set" & variables.retrieveAliasForColumn( arguments.key ),
+                    { 1 = arguments.value }
+                );
             } else {
-                variables._data[ retrieveColumnForAlias( key ) ] = isNull( value ) ? javacast( "null", "" ) : value;
-                variables[ retrieveAliasForColumn( key ) ] = isNull( value ) ? javacast( "null", "" ) : value;
+                variables._data[ variables.retrieveColumnForAlias( arguments.key ) ] = isNull( arguments.value ) ?
+                    javacast( "null", "" ) :
+                    arguments.value;
+                variables[ variables.retrieveAliasForColumn( arguments.key ) ] = isNull( arguments.value ) ?
+                    javacast( "null", "" ) :
+                    arguments.value;
             }
         } );
 
@@ -152,21 +162,22 @@ component accessors="true" {
     function fill( attributes, ignoreNonExistentAttributes = false ) {
         for ( var key in arguments.attributes ) {
             var value = arguments.attributes[ key ];
-            var rs = tryRelationshipSetter( "set#key#", { "1" = value } );
+            var rs = variables.tryRelationshipSetter( "set#key#", { "1" = value } );
 			if ( ! isNull( rs ) ) { continue; }
-			if( ! arguments.ignoreNonExistentAttributes && ! hasAttribute( key ) ) {
-                guardAgainstNonExistentAttribute( key );
-			} else if( hasAttribute( key ) ) {
-                variables._data[ retrieveColumnForAlias( key ) ] = value;
-				invoke( this, "set#retrieveAliasForColumn( key )#", { 1 = value } );
+			if( ! arguments.ignoreNonExistentAttributes && ! variables.hasAttribute( key ) ) {
+                variables.guardAgainstNonExistentAttribute( key );
+			} else if( variables.hasAttribute( key ) ) {
+                variables._data[ variables.retrieveColumnForAlias( key ) ] = value;
+				invoke( this, "set" & variables.retrieveAliasForColumn( key ), { 1 = value } );
 			}
-            guardAgainstReadOnlyAttribute( key );
+            variables.guardAgainstReadOnlyAttribute( key );
         }
         return this;
     }
 
     function hasAttribute( name ) {
-        return structKeyExists( variables._attributes, retrieveAliasForColumn( arguments.name ) ) || variables._key == name;
+        return structKeyExists( variables._attributes, variables.retrieveAliasForColumn( arguments.name ) ) ||
+            variables._key == arguments.name;
     }
 
     function isColumnAlias( name ) {
@@ -174,22 +185,28 @@ component accessors="true" {
     }
 
     function retrieveColumnForAlias( name ) {
-        return variables._attributes.keyExists( arguments.name ) ? variables._attributes[ arguments.name ] : arguments.name;
+        return variables._attributes.keyExists( arguments.name ) ?
+            variables._attributes[ arguments.name ] :
+            arguments.name;
     }
 
     function retrieveAliasForColumn( name ) {
-        return variables._attributes.reduce( function( acc, alias, column ) {
-            return name == column ? alias : acc;
-        }, arguments.name );
+        for ( var alias in variables._attributes ) {
+            var column = variables._attributes[ alias ];
+            if ( column == arguments.name ) {
+                arguments.name = alias;
+            }
+        }
+        return arguments.name;
     }
 
     function transformAttributeAliases( attributes ) {
         return arguments.attributes.reduce( function( acc, key, value ) {
-            if ( isColumnAlias( key ) ) {
-                key = retrieveColumnForAlias( key );
+            if ( variables.isColumnAlias( arguments.key ) ) {
+                arguments.key = variables.retrieveColumnForAlias( arguments.key );
             }
-            acc[ key ] = value;
-            return acc;
+            arguments.acc[ arguments.key ] = arguments.value;
+            return arguments.acc;
         }, {} );
     }
 
@@ -214,22 +231,28 @@ component accessors="true" {
     }
 
     function retrieveAttribute( name, defaultValue = "" ) {
-        if ( variables.keyExists( retrieveAliasForColumn( name ) ) && ! isReadOnlyAttribute( name ) ) {
-            forceAssignAttribute( name, variables[ retrieveAliasForColumn( name ) ] );
+        if (
+            variables.keyExists( variables.retrieveAliasForColumn( arguments.name ) ) &&
+            ! variables.isReadOnlyAttribute( arguments.name )
+        ) {
+            variables.forceAssignAttribute(
+                arguments.name,
+                variables[ variables.retrieveAliasForColumn( arguments.name ) ]
+            );
         }
 
-        if ( ! variables._data.keyExists( retrieveColumnForAlias( arguments.name ) ) ) {
-            return castValueForGetter(
+        if ( ! variables._data.keyExists( variables.retrieveColumnForAlias( arguments.name ) ) ) {
+            return variables.castValueForGetter(
                 arguments.name,
                 arguments.defaultValue
             );
         }
 
-        var data = variables.keyExists( "get" & retrieveAliasForColumn( arguments.name ) ) ?
-            invoke( this, "get" & retrieveAliasForColumn( arguments.name ) ) :
-            variables._data[ retrieveColumnForAlias( arguments.name ) ];
+        var data = variables.keyExists( "get" & variables.retrieveAliasForColumn( arguments.name ) ) ?
+            invoke( this, "get" & variables.retrieveAliasForColumn( arguments.name ) ) :
+            variables._data[ variables.retrieveColumnForAlias( arguments.name ) ];
 
-        return castValueForGetter(
+        return variables.castValueForGetter(
             arguments.name,
             data
         );
@@ -237,19 +260,19 @@ component accessors="true" {
 
     function forceAssignAttribute( name, value ) {
         arguments.force = true;
-        return assignAttribute( argumentCollection = arguments );
+        return variables.assignAttribute( argumentCollection = arguments );
     }
 
     function assignAttribute( name, value, force = false ) {
         if ( arguments.force ) {
-            if ( ! variables._attributes.keyExists( retrieveAliasForColumn( arguments.name ) ) ) {
+            if ( ! variables._attributes.keyExists( variables.retrieveAliasForColumn( arguments.name ) ) ) {
                 variables._attributes[ arguments.name ] = arguments.name;
-                variables._meta.properties[ arguments.name ] = paramProperty( { "name" = arguments.name } );
+                variables._meta.properties[ arguments.name ] = variables.paramProperty( { "name" = arguments.name } );
                 variables._meta.originalMetadata.properties.append( variables._meta.properties[ arguments.name ] );
             }
         } else {
-            guardAgainstNonExistentAttribute( arguments.name );
-            guardAgainstReadOnlyAttribute( arguments.name );
+            variables.guardAgainstNonExistentAttribute( arguments.name );
+            variables.guardAgainstReadOnlyAttribute( arguments.name );
         }
         if ( ! isSimpleValue( arguments.value ) ) {
             if ( ! structKeyExists( arguments.value, "keyValue" ) ) {
@@ -259,10 +282,12 @@ component accessors="true" {
                     detail = isSimpleValue( arguments.value ) ? arguments.value : getMetadata( arguments.value ).fullname
                 );
             }
-            arguments.value = castValueForSetter( arguments.name, arguments.value.keyValue() );
+            arguments.value = variables.castValueForSetter( arguments.name, arguments.value.keyValue() );
         }
-        variables._data[ retrieveColumnForAlias( arguments.name ) ] = castValueForSetter( arguments.name, arguments.value );
-        variables[ retrieveAliasForColumn( arguments.name ) ] = castValueForSetter( arguments.name, arguments.value );
+        variables._data[ variables.retrieveColumnForAlias( arguments.name ) ] =
+            variables.castValueForSetter( arguments.name, arguments.value );
+        variables[ variables.retrieveAliasForColumn( arguments.name ) ] =
+            variables.castValueForSetter( arguments.name, arguments.value );
         return this;
     }
 
@@ -278,13 +303,13 @@ component accessors="true" {
     =====================================*/
 
     function getEntities() {
-        applyGlobalScopes();
-        return retrieveQuery()
+        variables.applyGlobalScopes();
+        return variables.retrieveQuery()
             .get( options = variables._queryOptions )
             .map( function( attrs ) {
-                return newEntity()
-                    .assignAttributesData( attrs )
-                    .assignOriginalAttributes( attrs )
+                return variables.newEntity()
+                    .assignAttributesData( arguments.attrs )
+                    .assignOriginalAttributes( arguments.attrs )
                     .markLoaded();
             } );
     }
@@ -1077,31 +1102,31 @@ component accessors="true" {
 
     private function generateFunctionNameList( functions ) {
         return arguments.functions.map( function( func ) {
-            return lcase( func.name );
+            return lcase( arguments.func.name );
         } );
     }
 
     private function generateProperties( properties ) {
         return arguments.properties.reduce( function( acc, prop ) {
-            var newProp = paramProperty( prop );
+            var newProp = variables.paramProperty( arguments.prop );
             if ( ! newProp.persistent ) {
-                return acc;
+                return arguments.acc;
             }
-            acc[ newProp.name ] = newProp;
-            return acc;
+            arguments.acc[ newProp.name ] = newProp;
+            return arguments.acc;
         }, {} );
     }
 
     private function paramProperty( prop ) {
-        param prop.column = arguments.prop.name;
-        param prop.persistent = true;
-        param prop.nullValue = "";
-        param prop.convertToNull = true;
-        param prop.casts = "";
-        param prop.readOnly = false;
-        param prop.sqltype = "";
-        param prop.insert = true;
-        param prop.update = true;
+        param arguments.prop.column = arguments.prop.name;
+        param arguments.prop.persistent = true;
+        param arguments.prop.nullValue = "";
+        param arguments.prop.convertToNull = true;
+        param arguments.prop.casts = "";
+        param arguments.prop.readOnly = false;
+        param arguments.prop.sqltype = "";
+        param arguments.prop.insert = true;
+        param arguments.prop.update = true;
         return arguments.prop;
     }
 
