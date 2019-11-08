@@ -46,7 +46,11 @@
         "tests",
         ".engine",
         ".travis.yml",
+        ".cfformat.json",
+        ".cfconfig.json",
+        ".env.example",
         ".gitignore",
+        "quick300.png",
         "server.json"
     ]
 }
