@@ -1,15 +1,15 @@
 component accessors="true" extends="quick.models.Relationships.BaseRelationship" {
 
-    function init(
-        related,
-        relationName,
-        relationMethodName,
-        parent,
-        table,
-        foreignPivotKey,
-        relatedPivotKey,
-        parentKey,
-        relatedKey
+    public BelongsToMany function init(
+        required any related,
+        required string relationName,
+        required string relationMethodName,
+        required any parent,
+        required string table,
+        required string foreignPivotKey,
+        required string relatedPivotKey,
+        required string parentKey,
+        required string relatedKey
     ) {
         variables.table = arguments.table;
         variables.parentKey = arguments.parentKey;
@@ -25,16 +25,16 @@ component accessors="true" extends="quick.models.Relationships.BaseRelationship"
         );
     }
 
-    function getResults() {
+    public array function getResults() {
         return variables.related.get();
     }
 
-    function addConstraints() {
+    public void function addConstraints() {
         variables.performJoin();
         variables.addWhereConstraints();
     }
 
-    function addEagerConstraints( entities ) {
+    public void function addEagerConstraints( required array entities ) {
         variables.related
             .from( variables.table )
             .whereIn(
@@ -43,14 +43,21 @@ component accessors="true" extends="quick.models.Relationships.BaseRelationship"
             );
     }
 
-    function initRelation( entities, relation ) {
+    public array function initRelation(
+        required array entities,
+        required string relation
+    ) {
         for ( var entity in arguments.entities ) {
             entity.assignRelationship( arguments.relation, [] );
         }
         return arguments.entities;
     }
 
-    function match( entities, results, relation ) {
+    public array function match(
+        required array entities,
+        required array results,
+        required string relation
+    ) {
         var dictionary = buildDictionary( arguments.results );
         for ( var entity in arguments.entities ) {
             if ( structKeyExists( dictionary, entity.retrieveAttribute( variables.parentKey ) ) ) {
@@ -63,7 +70,7 @@ component accessors="true" extends="quick.models.Relationships.BaseRelationship"
         return arguments.entities;
     }
 
-    function buildDictionary( results ) {
+    public struct function buildDictionary( required array results ) {
         return arguments.results.reduce( function( dict, result ) {
             var key = arguments.result.retrieveAttribute( variables.foreignPivotKey );
             if ( ! structKeyExists( arguments.dict, key ) ) {
@@ -74,7 +81,7 @@ component accessors="true" extends="quick.models.Relationships.BaseRelationship"
         }, {} );
     }
 
-    function performJoin() {
+    public BelongsToMany function performJoin() {
         var baseTable = variables.related.get_table();
         var key = baseTable & "." & variables.relatedKey;
         variables.related.join(
@@ -86,7 +93,7 @@ component accessors="true" extends="quick.models.Relationships.BaseRelationship"
         return this;
     }
 
-    function addWhereConstraints() {
+    public BelongsToMany function addWhereConstraints() {
         variables.related.where(
             variables.getQualifiedForeignPivotKeyName(),
             "=",
@@ -95,20 +102,20 @@ component accessors="true" extends="quick.models.Relationships.BaseRelationship"
         return this;
     }
 
-    function getQualifiedRelatedPivotKeyName() {
+    public string function getQualifiedRelatedPivotKeyName() {
         return variables.table & "." & variables.relatedPivotKey;
     }
 
-    function getQualifiedForeignPivotKeyName() {
+    public string function getQualifiedForeignPivotKeyName() {
         return variables.table & "." & variables.foreignPivotKey;
     }
 
-    function attach( id ) {
+    public void function attach( required any id ) {
         variables.newPivotStatement()
             .insert( variables.parseIdsForInsert( arguments.id ) );
     }
 
-    function detach( id ) {
+    public void function detach( required any id ) {
         var foreignPivotKeyValue = variables.parent.retrieveAttribute( variables.parentKey );
         variables.newPivotStatement()
             .where( variables.foreignPivotKey, "=", foreignPivotKeyValue )
@@ -118,11 +125,11 @@ component accessors="true" extends="quick.models.Relationships.BaseRelationship"
             ).delete();
     }
 
-    function applySetter() {
+    public any function applySetter() {
         return variables.sync( argumentCollection = arguments );
     }
 
-    function sync( id ) {
+    public any function sync( required any id ) {
         var foreignPivotKeyValue = variables.parent.retrieveAttribute( variables.parentKey );
         variables.newPivotStatement()
             .where( variables.foreignPivotKey, "=", foreignPivotKeyValue )
@@ -131,11 +138,11 @@ component accessors="true" extends="quick.models.Relationships.BaseRelationship"
         return variables.parent;
     }
 
-    function newPivotStatement() {
+    public QueryBuilder function newPivotStatement() {
         return variables.related.newQuery().from( variables.table );
     }
 
-    function parseIds( value ) {
+    public array function parseIds( required any value ) {
         arguments.value = isArray( arguments.value ) ? arguments.value : [ arguments.value ];
         return arguments.value.map( function( val ) {
             // If the value is not a simple value, we will assume
@@ -147,7 +154,7 @@ component accessors="true" extends="quick.models.Relationships.BaseRelationship"
         } );
     }
 
-    function parseIdsForInsert( value ) {
+    public array function parseIdsForInsert( required any value ) {
         var foreignPivotKeyValue = variables.parent.retrieveAttribute( variables.parentKey );
         arguments.value = isArray( arguments.value ) ? arguments.value : [ arguments.value ];
         return arguments.value.map( function( val ) {

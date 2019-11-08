@@ -2,156 +2,202 @@ component accessors="true" {
 
     property name="entity";
 
-    function init( entity, query ) {
+    public CBORMCriteriaBuilderCompat function init( any entity entity ) {
         if ( ! isNull( arguments.entity ) ) {
             variables.entity = arguments.entity;
         }
         return this;
     }
 
-    function getSQL() {
+    public string function getSQL() {
         return variables.entity.retrieveQuery().toSQL();
     }
 
-    function between( column, start, end ) {
+    public CBORMCriteriaBuilderCompat function between(
+        required string column,
+        required any start,
+        required any end
+    ) {
         variables.entity
             .retrieveQuery()
             .whereBetween( arguments.column, arguments.start, arguments.end );
         return this;
     }
 
-    function eqProperty( left, right ) {
+    public CBORMCriteriaBuilderCompat function eqProperty(
+        required string left,
+        required string right
+    ) {
         variables.entity
             .retrieveQuery()
             .whereColumn( arguments.left, arguments.right );
         return this;
     }
 
-    function isEQ( column, value ) {
+    public CBORMCriteriaBuilderCompat function isEQ(
+        required string column,
+        required any value
+    ) {
         variables.entity
             .retrieveQuery()
             .where( arguments.column, "=", arguments.value );
         return this;
     }
 
-    function isGT( column, value ) {
+    public CBORMCriteriaBuilderCompat function isGT(
+        required string column,
+        required any value
+    ) {
         variables.entity
             .retrieveQuery()
             .where( arguments.column, ">", arguments.value );
         return this;
     }
 
-    function gtProperty( left, right ) {
+    public CBORMCriteriaBuilderCompat function gtProperty(
+        required string left,
+        required string right
+    ) {
         variables.entity
             .retrieveQuery()
             .whereColumn( arguments.left, ">", arguments.right );
         return this;
     }
 
-    function isGE( column, value ) {
+    public CBORMCriteriaBuilderCompat function isGE(
+        required string column,
+        required any value
+    ) {
         variables.entity
             .retrieveQuery()
             .where( arguments.column, ">=", arguments.value );
         return this;
     }
 
-    function geProperty( left, right ) {
+    public CBORMCriteriaBuilderCompat function geProperty(
+        required string left,
+        required string right
+    ) {
         variables.entity
             .retrieveQuery()
             .whereColumn( arguments.left, ">=", arguments.right );
         return this;
     }
 
-    function idEQ( id ) {
+    public CBORMCriteriaBuilderCompat function idEQ( required any id ) {
         variables.entity
             .retrieveQuery()
             .where( variables.entity.get_key(), arguments.id );
         return this;
     }
 
-    function like( column, value ) {
+    public CBORMCriteriaBuilderCompat function like(
+        required string column,
+        required any value
+    ) {
         variables.entity
             .retrieveQuery()
             .where( arguments.column, "like", arguments.value );
         return this;
     }
 
-    function ilike( column, value ) {
+    public CBORMCriteriaBuilderCompat function ilike(
+        required string column,
+        required any value
+    ) {
         variables.entity
             .retrieveQuery()
             .where( arguments.column, "ilike", arguments.value );
         return this;
     }
 
-    function isIn( column, values ) {
+    public CBORMCriteriaBuilderCompat function isIn(
+        required string column,
+        required any values
+    ) {
         variables.entity
             .retrieveQuery()
             .whereIn( arguments.column, arguments.values );
         return this;
     }
 
-    function isNull( column ) {
+    public CBORMCriteriaBuilderCompat function isNull( required string column ) {
         variables.entity.retrieveQuery().whereNull( column );
         return this;
     }
 
-    function isNotNull( column ) {
+    public CBORMCriteriaBuilderCompat function isNotNull( required string column ) {
         variables.entity
             .retrieveQuery()
             .whereNotNull( arguments.column );
         return this;
     }
 
-    function isLT( column, value ) {
+    public CBORMCriteriaBuilderCompat function isLT(
+        required string column,
+        required any value
+    ) {
         variables.entity
             .retrieveQuery()
             .where( arguments.column, "<", arguments.value );
         return this;
     }
 
-    function ltProperty( left, right ) {
+    public CBORMCriteriaBuilderCompat function ltProperty(
+        required string left,
+        required string right
+    ) {
         variables.entity
             .retrieveQuery()
             .whereColumn( arguments.left, "<", arguments.right );
         return this;
     }
 
-    function neProperty( left, right ) {
+    public CBORMCriteriaBuilderCompat function neProperty(
+        required string left,
+        required string right
+    ) {
         variables.entity
             .retrieveQuery()
             .whereColumn( arguments.left, "<>", arguments.right );
         return this;
     }
 
-    function isLE( column, value ) {
+    public CBORMCriteriaBuilderCompat function isLE(
+        required string column,
+        required any value
+    ) {
         variables.entity
             .retrieveQuery()
             .where( arguments.column, "<=", arguments.value );
         return this;
     }
 
-    function leProperty( left, right ) {
+    public CBORMCriteriaBuilderCompat function leProperty(
+        required string left,
+        required string right
+    ) {
         variables.entity
             .retrieveQuery()
             .whereColumn( arguments.left, "<=", arguments.right );
         return this;
     }
 
-    function maxResults( max ) {
+    public CBORMCriteriaBuilderCompat function maxResults( required numeric max ) {
         variables.entity
             .retrieveQuery()
             .limit( arguments.max );
         return this;
     }
 
-    function firstResult( offset ) {
+    public CBORMCriteriaBuilderCompat function firstResult( required numeric offset ) {
         variables.entity
             .retrieveQuery()
             .offset( arguments.offset );
         return this;
     }
 
-    function order( orders ) {
+    public CBORMCriteriaBuilderCompat function order( required any orders ) {
         arguments.orders = isArray( arguments.orders ) ?
             arguments.orders :
             listToArray( arguments.orders, "," );
@@ -163,19 +209,22 @@ component accessors="true" {
         return this;
     }
 
-    function list() {
+    public array function list() {
         return variables.entity.getAll();
     }
 
-    function get() {
+    public any function get() {
         return variables.entity.first();
     }
 
-    function count() {
+    public numeric function count() {
         return variables.entity.count();
     }
 
-    function onMissingMethod( missingMethodName, missingMethodArguments ) {
+    public CBORMCriteriaBuilderCompat function onMissingMethod(
+        required string missingMethodName,
+        required struct missingMethodArguments
+    ) {
         invoke( variables.query, arguments.missingMethodName, arguments.missingMethodArguments );
         return this;
     }

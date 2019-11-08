@@ -1,11 +1,11 @@
 component {
 
-    function init( required injector ) {
+    public QuickServiceDSL function init( required Injector injector ) {
         variables.injector = arguments.injector;
         return this;
     }
 
-    function process( required definition, targetObject ) {
+    public BaseService function process( required struct definition, any targetObject ) {
         return variables.injector.getInstance(
             name = "BaseService@quick",
             initArguments = {

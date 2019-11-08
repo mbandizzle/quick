@@ -915,7 +915,7 @@ component accessors="true" {
         return this;
     }
 
-    public any function newQuery() {
+    public QueryBuilder function newQuery() {
         if ( variables._meta.originalMetadata.keyExists( "grammar" ) ) {
             variables._builder.setGrammar(
                 // TODO: Change to use the mapping as itself when upgrading to qb@7
@@ -932,7 +932,7 @@ component accessors="true" {
         return variables.query;
     }
 
-    public any function retrieveQuery() {
+    public QueryBuilder function retrieveQuery() {
         if ( ! structKeyExists( variables, "query" ) ) {
             variables.query = variables.newQuery();
         }

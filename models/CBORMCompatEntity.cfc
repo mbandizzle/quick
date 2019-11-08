@@ -2,7 +2,7 @@ component extends="quick.models.BaseEntity" {
 
     property name="CBORMCriteriaBuilderCompat" inject="provider:CBORMCriteriaBuilderCompat@quick";
 
-    function list(
+    public any function list(
         struct criteria = {},
         string sortOrder,
         numeric offset,
@@ -33,7 +33,7 @@ component extends="quick.models.BaseEntity" {
         }
     }
 
-    function countWhere() {
+    public numeric function countWhere() {
         for ( var key in arguments ) {
             variables.retrieveQuery().where(
                 variables.retrieveColumnForAlias( key ),
@@ -43,13 +43,13 @@ component extends="quick.models.BaseEntity" {
         return variables.retrieveQuery().count();
     }
 
-    function deleteById( id ) {
+    public CBORMCompatEntity function deleteById( required any id ) {
         arguments.id = isArray( arguments.id ) ? arguments.id : [ arguments.id ];
         variables.retrieveQuery().whereIn( get_key(), arguments.id ).delete();
         return this;
     }
 
-    function deleteWhere() {
+    public struct function deleteWhere() {
         for ( var key in arguments ) {
             variables.retrieveQuery().where(
                 variables.retrieveColumnForAlias( key ),
@@ -59,14 +59,17 @@ component extends="quick.models.BaseEntity" {
         return super.deleteAll();
     }
 
-    function exists( id ) {
+    public boolean function exists( any id ) {
         if ( ! isNull( arguments.id ) ) {
             variables.retrieveQuery().where( get_key(), arguments.id );
         }
         return variables.retrieveQuery().exists();
     }
 
-    function findAllWhere( criteria = {}, sortOrder ) {
+    public array function findAllWhere(
+        required struct criteria = {},
+        any sortOrder
+    ) {
         structEach( arguments.criteria, function( key, value ) {
             variables.retrieveQuery().where(
                 variables.retrieveColumnForAlias( arguments.key ),
@@ -82,7 +85,7 @@ component extends="quick.models.BaseEntity" {
         return super.get();
     }
 
-    function findWhere( criteria = {} ) {
+    public any function findWhere( struct criteria = {} ) {
         structEach( arguments.criteria, function( key, value ) {
             variables.retrieveQuery().where(
                 variables.retrieveColumnForAlias( arguments.key ),
@@ -92,14 +95,14 @@ component extends="quick.models.BaseEntity" {
         return super.first();
     }
 
-    function get( id = 0, returnNew = true ) {
+    public any function get( any id = 0, boolean returnNew = true ) {
         if ( ( isNull( arguments.id ) || arguments.id == 0 ) && arguments.returnNew ) {
             return super.newEntity();
         }
         return invoke( this, "find", { id = arguments.id } );
     }
 
-    function getAll( id, sortOrder ) {
+    public array function getAll( any id, any sortOrder ) {
         if ( isNull( arguments.id ) ) {
             if ( ! isNull( arguments.sortOrder ) ) {
                 var sorts = listToArray( arguments.sortOrder, "," ).map( function( sort ) {
@@ -114,30 +117,30 @@ component extends="quick.models.BaseEntity" {
         return super.get();
     }
 
-    function new( properties = {} ) {
+    public any function new( struct properties = {} ) {
         return super.newEntity().fill( arguments.properties );
     }
 
-    function populate( properties = {} ) {
+    public CBORMCompatEntity function populate( struct properties = {} ) {
         super.fill( arguments.properties );
         return this;
     }
 
-    function save( entity ) {
+    public any function save( any entity ) {
         if ( isNull( arguments.entity ) ) {
             return super.save();
         }
         return arguments.entity.save();
     }
 
-    function saveAll( entities = [] ) {
+    public CBORMCompatEntity function saveAll( array entities = [] ) {
         arguments.entities.each( function( entity ) {
             arguments.entity.save();
         } );
         return this;
     }
 
-    function newCriteria() {
+    public CBORMCriteriaBuilderCompat function newCriteria() {
         return variables.CBORMCriteriaBuilderCompat.get()
             .setEntity( this );
     }

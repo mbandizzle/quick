@@ -1,15 +1,15 @@
 component accessors="true" extends="quick.models.Relationships.BaseRelationship" {
 
-    function init(
-        related,
-        relationName,
-        relationMethodName,
-        parent,
-        intermediate,
-        firstKey,
-        secondKey,
-        localKey,
-        secondLocalKey
+    public HasManyThrough function init(
+        required any related,
+        required string relationName,
+        required string relationMethodName,
+        required any parent,
+        required any intermediate,
+        required string firstKey,
+        required string secondKey,
+        required string localKey,
+        required string secondLocalKey
     ) {
         variables.throughParent = arguments.intermediate;
         variables.farParent = arguments.parent;
@@ -27,7 +27,7 @@ component accessors="true" extends="quick.models.Relationships.BaseRelationship"
         );
     }
 
-    function addConstraints() {
+    public void function addConstraints() {
         var localValue = variables.farParent.retrieveAttribute( variables.localKey );
         variables.performJoin();
         variables.related.where(
@@ -37,7 +37,7 @@ component accessors="true" extends="quick.models.Relationships.BaseRelationship"
         );
     }
 
-    function performJoin() {
+    public HasManyThrough function performJoin() {
         var farKey = variables.getQualifiedFarKeyName();
         variables.related.join(
             variables.throughParent.get_Table(),
@@ -45,29 +45,30 @@ component accessors="true" extends="quick.models.Relationships.BaseRelationship"
             "=",
             farKey
         );
+        return this;
     }
 
-    function getQualifiedFarKeyName() {
+    public string function getQualifiedFarKeyName() {
         return variables.getQualifiedForeignKeyName();
     }
 
-    function getQualifiedForeignKeyName() {
+    public string function getQualifiedForeignKeyName() {
         return variables.related.qualifyColumn( variables.secondKey );
     }
 
-    function getQualifiedFirstKeyName() {
+    public string function getQualifiedFirstKeyName() {
         return variables.throughParent.qualifyColumn( variables.firstKey );
     }
 
-    function getQualifiedParentKeyName() {
+    public string function getQualifiedParentKeyName() {
         return variables.parent.qualifyColumn( variables.secondLocalKey );
     }
 
-    function getResults() {
+    public array function getResults() {
         return variables.get();
     }
 
-    function get() {
+    public array function get() {
         var entities = variables.related.getEntities();
         if ( entities.len() > 0 ) {
             entities = variables.related.eagerLoadRelations( entities );
@@ -75,22 +76,30 @@ component accessors="true" extends="quick.models.Relationships.BaseRelationship"
         return entities;
     }
 
-    function addEagerConstraints( entities ) {
+    public HasManyThrough function addEagerConstraints( required array entities ) {
         variables.performJoin();
         variables.related.whereIn(
             variables.getQualifiedFirstKeyName(),
             variables.getKeys( arguments.entities, variables.localKey )
         );
+        return this;
     }
 
-    function initRelation( entities, relation ) {
+    public array function initRelation(
+        required array entities,
+        required string relation
+    ) {
         for ( var entity in arguments.entities ) {
             entity.assignRelationship( arguments.relation, [] );
         }
         return arguments.entities;
     }
 
-    function match( entities, results, relation ) {
+    public array function match(
+        required array entities,
+        required array results,
+        required string relation
+    ) {
         var dictionary = buildDictionary( arguments.results );
         for ( var entity in arguments.entities ) {
             var key = entity.retrieveAttribute( variables.localKey );
@@ -101,7 +110,7 @@ component accessors="true" extends="quick.models.Relationships.BaseRelationship"
         return arguments.entities;
     }
 
-    function buildDictionary( results ) {
+    public struct function buildDictionary( required array results ) {
         return arguments.results.reduce( function( dict, result ) {
             var key = arguments.result.retrieveAttribute( variables.firstKey );
             if ( ! structKeyExists( arguments.dict, key ) ) {

@@ -2,7 +2,12 @@ component {
 
     property name="wirebox" inject="wirebox";
 
-    function init( related, relationName, relationMethodName, parent ) {
+    public BaseRelationship function init(
+        required any related,
+        required string relationName,
+        required string relationMethodName,
+        required any parent
+    ) {
         variables.related = arguments.related.resetQuery();
         variables.relationName = arguments.relationName;
         variables.relationMethodName = arguments.relationMethodName;
@@ -13,32 +18,32 @@ component {
         return this;
     }
 
-    function setRelationMethodName( name ) {
+    public BaseRelationship function setRelationMethodName( required string name ) {
         variables.relationMethodName = arguments.name;
         return this;
     }
 
-    function getEager() {
+    public array function getEager() {
         return variables.related.get();
     }
 
-    function first() {
+    public any function first() {
         return variables.related.first();
     }
 
-    function firstOrFail() {
+    public any function firstOrFail() {
         return variables.related.firstOrFail();
     }
 
-    function find( id ) {
+    public any function find( required any id ) {
         return variables.related.find( arguments.id );
     }
 
-    function findOrFail( id ) {
+    public any function findOrFail( required any id ) {
         return variables.related.findOrFail( arguments.id );
     }
 
-    function all() {
+    public array function all() {
         return variables.related.all();
     }
 
@@ -46,12 +51,11 @@ component {
     * get()
     * @hint wrapper for getResults() on relationship types that have them, which is most of them. get() implemented for consistency with QB and Quick
     */
-
-    function get() {
+    public any function get() {
         return variables.getResults();
     }
 
-    function getKeys( entities, key ) {
+    public array function getKeys( required array entities, required string key ) {
         var keys = [];
         for ( var entity in arguments.entities ) {
             keys.append( entity.retrieveAttribute( arguments.key ) );
@@ -59,7 +63,10 @@ component {
         return unique( keys );
     }
 
-    function onMissingMethod( missingMethodName, missingMethodArguments ) {
+    public any function onMissingMethod(
+        required string missingMethodName,
+        required struct missingMethodArguments
+    ) {
         var result = invoke(
             variables.related,
             arguments.missingMethodName,
@@ -71,7 +78,7 @@ component {
         return this;
     }
 
-    function unique( items ) {
+    public array function unique( required array items ) {
         return arraySlice( createObject( "java", "java.util.HashSet" ).init( arguments.items ).toArray(), 1 );
     }
 

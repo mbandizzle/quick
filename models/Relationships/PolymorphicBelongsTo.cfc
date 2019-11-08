@@ -1,6 +1,14 @@
 component extends="quick.models.Relationships.BelongsTo" {
 
-    function init( related, relationName, relationMethodName, parent, foreignKey, ownerKey, type ) {
+    public PolymorphicBelongsTo function init(
+        required any related,
+        required string relationName,
+        required string relationMethodName,
+        required any parent,
+        required string foreignKey,
+        required string ownerKey,
+        required string type
+    ) {
         variables.morphType = arguments.type;
 
         return super.init(
@@ -13,12 +21,13 @@ component extends="quick.models.Relationships.BelongsTo" {
         );
     }
 
-    function addEagerConstraints( entities ) {
+    public PolymorphicBelongsTo function addEagerConstraints( required array entities ) {
         variables.entities = arguments.entities;
         variables.buildDictionary( variables.entities );
+        return this;
     }
 
-    function buildDictionary( entities ) {
+    public struct function buildDictionary( required array entities ) {
         variables.dictionary = arguments.entities.reduce( function( dict, entity ) {
             var type = arguments.entity.retrieveAttribute( variables.morphType );
             if ( ! structKeyExists( arguments.dict, type ) )  {
@@ -31,13 +40,14 @@ component extends="quick.models.Relationships.BelongsTo" {
             arrayAppend( arguments.dict[ type ][ key ], arguments.entity );
             return arguments.dict;
         }, {} );
+        return variables.dictionary;
     }
 
-    function getResults() {
+    public any function getResults() {
         return variables.ownerKey != "" ? super.getResults() : {};
     }
 
-    function getEager() {
+    public array function getEager() {
         structKeyArray( variables.dictionary ).each( function( type ) {
             variables.matchToMorphParents(
                arguments.type,
@@ -48,7 +58,7 @@ component extends="quick.models.Relationships.BelongsTo" {
         return variables.entities;
     }
 
-    function getResultsByType( type ) {
+    public any function getResultsByType( required string type ) {
         var instance = createModelByType( arguments.type );
         var localOwnerKey = variables.ownerKey != "" ? variables.ownerKey : instance.get_Key();
         instance.with( variables.related.get_eagerLoad() );
@@ -59,18 +69,21 @@ component extends="quick.models.Relationships.BelongsTo" {
         ).get();
     }
 
-    function gatherKeysByType( type ) {
+    public array function gatherKeysByType( required string type ) {
         return unique( structReduce( variables.dictionary[ arguments.type ], function( acc, key, values ) {
             arrayAppend( arguments.acc, arguments.values[ 1 ].retrieveAttribute( variables.foreignKey ) );
             return arguments.acc;
         }, [] ) );
     }
 
-    function createModelByType( type ) {
+    public any function createModelByType( required string type ) {
         return variables.wirebox.getInstance( arguments.type );
     }
 
-    function matchToMorphParents( type, results ) {
+   public PolymorphicBelongsTo function matchToMorphParents(
+       required string type,
+       required array results
+    ) {
         for ( var result in arguments.results ) {
             var ownerKeyValue = variables.ownerKey != "" ? result.retrieveAttribute( variables.ownerKey ) : result.keyValue();
             if ( structKeyExists( variables.dictionary[ arguments.type ], ownerKeyValue ) ) {
@@ -80,6 +93,7 @@ component extends="quick.models.Relationships.BelongsTo" {
                 } );
             }
         }
+        return this;
     }
 
 }

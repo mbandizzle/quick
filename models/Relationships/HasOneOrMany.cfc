@@ -1,6 +1,13 @@
 component extends="quick.models.Relationships.BaseRelationship" accessors="true" {
 
-    function init( related, relationName, relationMethodName, parent, foreignKey, localKey ) {
+    public HasOneOrMany function init(
+        required any related,
+        required string relationName,
+        required string relationMethodName,
+        required any parent,
+        required string foreignKey,
+        required string localKey
+    ) {
         variables.localKey = arguments.localKey;
         variables.foreignKey = arguments.foreignKey;
 
@@ -12,30 +19,45 @@ component extends="quick.models.Relationships.BaseRelationship" accessors="true"
         );
     }
 
-    function addConstraints() {
+    public HasOneOrMany function addConstraints() {
         variables.related.retrieveQuery()
             .where( variables.foreignKey, "=", variables.getParentKey() )
             .whereNotNull( variables.foreignKey );
+        return this;
     }
 
-    function addEagerConstraints( entities ) {
+    public HasOneOrMany function addEagerConstraints( required array entities ) {
         variables.related.retrieveQuery().whereIn(
             variables.foreignKey,
             variables.getKeys( arguments.entities, variables.localKey )
         );
+        return this;
     }
 
-    function matchOne( entities, results, relation ) {
+    public array function matchOne(
+        required array entities,
+        required array results,
+        required string relation
+    ) {
         arguments.type = "one";
         return matchOneOrMany( argumentCollection = arguments );
     }
 
-    function matchMany( entities, results, relation ) {
+    public array function matchMany(
+        required array entities,
+        required array results,
+        required string relation
+    ) {
         arguments.type = "many";
         return matchOneOrMany( argumentCollection = arguments );
     }
 
-    function matchOneOrMany( entities, results, relation, type ) {
+    public array function matchOneOrMany(
+        required array entities,
+        required array results,
+        required string relation,
+        required string type
+    ) {
         var dictionary = buildDictionary( arguments.results );
         for ( var entity in arguments.entities ) {
             var key = entity.retrieveAttribute( variables.localKey );
@@ -49,7 +71,7 @@ component extends="quick.models.Relationships.BaseRelationship" accessors="true"
         return arguments.entities;
     }
 
-    function buildDictionary( results ) {
+    public struct function buildDictionary( required array results ) {
         return arguments.results.reduce( function( dict, result ) {
             var key = arguments.result.retrieveAttribute( variables.foreignKey );
             if ( ! structKeyExists( arguments.dict, key ) ) {
@@ -60,16 +82,20 @@ component extends="quick.models.Relationships.BaseRelationship" accessors="true"
         }, {} );
     }
 
-    function getRelationValue( dictionary, key, type ) {
+    public any function getRelationValue(
+        required struct dictionary,
+        required string key,
+        required string type
+    ) {
         var value = arguments.dictionary[ arguments.key ];
         return arguments.type == "one" ? value[ 1 ] : value;
     }
 
-    function getParentKey() {
+    public any function getParentKey() {
         return variables.parent.retrieveAttribute( variables.localKey );
     }
 
-    function applySetter() {
+    public array function applySetter() {
         variables.related.updateAll(
             attributes = {
                 "#variables.foreignKey#" = { "value" = "", "cfsqltype" = "varchar", "null" = true, "nulls" = true }
@@ -79,14 +105,14 @@ component extends="quick.models.Relationships.BaseRelationship" accessors="true"
         return variables.saveMany( argumentCollection = arguments );
     }
 
-    function saveMany( entities ) {
+    public array function saveMany( required any entities ) {
         arguments.entities = isArray( arguments.entities ) ? arguments.entities : [ arguments.entities ];
         return arguments.entities.map( function( entity ) {
             return variables.save( arguments.entity );
         } );
     }
 
-    function save( entity ) {
+    public any function save( required any entity ) {
         if ( isSimpleValue( arguments.entity ) ) {
             arguments.entity = variables.related
                 .newEntity()
@@ -100,25 +126,26 @@ component extends="quick.models.Relationships.BaseRelationship" accessors="true"
         return arguments.entity.save();
     }
 
-    function create( attributes = {} ) {
+    public any function create( struct attributes = {} ) {
         var newInstance = variables.related.newEntity().fill( arguments.attributes );
         variables.setForeignAttributesForCreate( newInstance );
         return newInstance.save();
     }
 
-    function setForeignAttributesForCreate( entity ) {
+    public HasOneOrMany function setForeignAttributesForCreate( required any entity ) {
         arguments.entity.forceAssignAttribute(
             variables.getForeignKeyName(),
             variables.getParentKey()
         );
+        return this;
     }
 
-    function getForeignKeyName() {
+    public string function getForeignKeyName() {
         var parts = listToArray( variables.getQualifiedForeignKeyName(), "." );
         return parts[ arrayLen( parts ) ];
     }
 
-    function getQualifiedForeignKeyName() {
+    public string function getQualifiedForeignKeyName() {
         return variables.foreignKey;
     }
 

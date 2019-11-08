@@ -1,17 +1,24 @@
 component extends="quick.models.Relationships.PolymorphicHasOneOrMany" {
 
-    function getResults() {
+    public any function getResults() {
         return variables.related.get();
     }
 
-    function initRelation( entities, relation ) {
+    public array function initRelation(
+        required array entities,
+        required string relation
+    ) {
         for ( var entity in arguments.entities ) {
             entity.assignRelationship( arguments.relation, [] );
         }
         return arguments.entities;
     }
 
-    function match( entities, results, relation ) {
+    public array function match(
+        required array entities,
+        required array results,
+        required string relation
+    ) {
         return matchMany(
             arguments.entities,
             arguments.results,
