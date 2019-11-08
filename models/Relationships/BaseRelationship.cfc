@@ -18,7 +18,9 @@ component {
         return this;
     }
 
-    public BaseRelationship function setRelationMethodName( required string name ) {
+    public BaseRelationship function setRelationMethodName(
+        required string name
+    ) {
         variables.relationMethodName = arguments.name;
         return this;
     }
@@ -48,14 +50,17 @@ component {
     }
 
     /**
-    * get()
-    * @hint wrapper for getResults() on relationship types that have them, which is most of them. get() implemented for consistency with QB and Quick
-    */
+     * get()
+     * @hint wrapper for getResults() on relationship types that have them, which is most of them. get() implemented for consistency with QB and Quick
+     */
     public any function get() {
         return variables.getResults();
     }
 
-    public array function getKeys( required array entities, required string key ) {
+    public array function getKeys(
+        required array entities,
+        required string key
+    ) {
         var keys = [];
         for ( var entity in arguments.entities ) {
             keys.append( entity.retrieveAttribute( arguments.key ) );
@@ -79,7 +84,10 @@ component {
     }
 
     public array function unique( required array items ) {
-        return arraySlice( createObject( "java", "java.util.HashSet" ).init( arguments.items ).toArray(), 1 );
+        return arraySlice(
+            createObject( "java", "java.util.HashSet" ).init( arguments.items ).toArray(),
+            1
+        );
     }
 
 }

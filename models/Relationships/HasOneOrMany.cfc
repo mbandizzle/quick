@@ -20,17 +20,20 @@ component extends="quick.models.Relationships.BaseRelationship" accessors="true"
     }
 
     public HasOneOrMany function addConstraints() {
-        variables.related.retrieveQuery()
+        variables.related
+            .retrieveQuery()
             .where( variables.foreignKey, "=", variables.getParentKey() )
             .whereNotNull( variables.foreignKey );
         return this;
     }
 
     public HasOneOrMany function addEagerConstraints( required array entities ) {
-        variables.related.retrieveQuery().whereIn(
-            variables.foreignKey,
-            variables.getKeys( arguments.entities, variables.localKey )
-        );
+        variables.related
+            .retrieveQuery()
+            .whereIn(
+                variables.foreignKey,
+                variables.getKeys( arguments.entities, variables.localKey )
+            );
         return this;
     }
 
@@ -64,7 +67,11 @@ component extends="quick.models.Relationships.BaseRelationship" accessors="true"
             if ( structKeyExists( dictionary, key ) ) {
                 entity.assignRelationship(
                     arguments.relation,
-                    variables.getRelationValue( dictionary, key, arguments.type )
+                    variables.getRelationValue(
+                        dictionary,
+                        key,
+                        arguments.type
+                    )
                 );
             }
         }
@@ -73,8 +80,10 @@ component extends="quick.models.Relationships.BaseRelationship" accessors="true"
 
     public struct function buildDictionary( required array results ) {
         return arguments.results.reduce( function( dict, result ) {
-            var key = arguments.result.retrieveAttribute( variables.foreignKey );
-            if ( ! structKeyExists( arguments.dict, key ) ) {
+            var key = arguments.result.retrieveAttribute(
+                variables.foreignKey
+            );
+            if ( !structKeyExists( arguments.dict, key ) ) {
                 arguments.dict[ key ] = [];
             }
             arrayAppend( arguments.dict[ key ], arguments.result );
@@ -98,7 +107,12 @@ component extends="quick.models.Relationships.BaseRelationship" accessors="true"
     public array function applySetter() {
         variables.related.updateAll(
             attributes = {
-                "#variables.foreignKey#" = { "value" = "", "cfsqltype" = "varchar", "null" = true, "nulls" = true }
+                "#variables.foreignKey#" : {
+                    "value" : "",
+                    "cfsqltype" : "varchar",
+                    "null" : true,
+                    "nulls" : true
+                }
             },
             force = true
         );
@@ -106,7 +120,9 @@ component extends="quick.models.Relationships.BaseRelationship" accessors="true"
     }
 
     public array function saveMany( required any entities ) {
-        arguments.entities = isArray( arguments.entities ) ? arguments.entities : [ arguments.entities ];
+        arguments.entities = isArray( arguments.entities ) ? arguments.entities : [
+            arguments.entities
+        ];
         return arguments.entities.map( function( entity ) {
             return variables.save( arguments.entity );
         } );
@@ -127,12 +143,16 @@ component extends="quick.models.Relationships.BaseRelationship" accessors="true"
     }
 
     public any function create( struct attributes = {} ) {
-        var newInstance = variables.related.newEntity().fill( arguments.attributes );
+        var newInstance = variables.related
+            .newEntity()
+            .fill( arguments.attributes );
         variables.setForeignAttributesForCreate( newInstance );
         return newInstance.save();
     }
 
-    public HasOneOrMany function setForeignAttributesForCreate( required any entity ) {
+    public HasOneOrMany function setForeignAttributesForCreate(
+        required any entity
+    ) {
         arguments.entity.forceAssignAttribute(
             variables.getForeignKeyName(),
             variables.getParentKey()

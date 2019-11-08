@@ -23,13 +23,21 @@ component extends="quick.models.Relationships.HasOneOrMany" {
 
     public PolymorphicHasOneOrMany function addConstraints() {
         super.addConstraints();
-        variables.related.where( variables.morphType, variables.morphClass );
+        variables.related.where(
+            variables.morphType,
+            variables.morphClass
+        );
         return this;
     }
 
-    public PolymorphicHasOneOrMany function addEagerConstraints( required array entities ) {
+    public PolymorphicHasOneOrMany function addEagerConstraints(
+        required array entities
+    ) {
         super.addEagerConstraints( arguments.entities );
-        variables.related.where( variables.morphType, variables.morphClass );
+        variables.related.where(
+            variables.morphType,
+            variables.morphClass
+        );
         return this;
     }
 

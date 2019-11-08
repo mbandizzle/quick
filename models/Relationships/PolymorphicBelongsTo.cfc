@@ -21,7 +21,9 @@ component extends="quick.models.Relationships.BelongsTo" {
         );
     }
 
-    public PolymorphicBelongsTo function addEagerConstraints( required array entities ) {
+    public PolymorphicBelongsTo function addEagerConstraints(
+        required array entities
+    ) {
         variables.entities = arguments.entities;
         variables.buildDictionary( variables.entities );
         return this;
@@ -29,12 +31,16 @@ component extends="quick.models.Relationships.BelongsTo" {
 
     public struct function buildDictionary( required array entities ) {
         variables.dictionary = arguments.entities.reduce( function( dict, entity ) {
-            var type = arguments.entity.retrieveAttribute( variables.morphType );
-            if ( ! structKeyExists( arguments.dict, type ) )  {
+            var type = arguments.entity.retrieveAttribute(
+                variables.morphType
+            );
+            if ( !structKeyExists( arguments.dict, type ) ) {
                 arguments.dict[ type ] = {};
             }
-            var key = arguments.entity.retrieveAttribute( variables.foreignKey );
-            if ( ! structKeyExists( arguments.dict[ type ], key ) )  {
+            var key = arguments.entity.retrieveAttribute(
+                variables.foreignKey
+            );
+            if ( !structKeyExists( arguments.dict[ type ], key ) ) {
                 arguments.dict[ type ][ key ] = [];
             }
             arrayAppend( arguments.dict[ type ][ key ], arguments.entity );
@@ -50,8 +56,8 @@ component extends="quick.models.Relationships.BelongsTo" {
     public array function getEager() {
         structKeyArray( variables.dictionary ).each( function( type ) {
             variables.matchToMorphParents(
-               arguments.type,
-               variables.getResultsByType( arguments.type )
+                arguments.type,
+                variables.getResultsByType( arguments.type )
             );
         } );
 
@@ -63,33 +69,58 @@ component extends="quick.models.Relationships.BelongsTo" {
         var localOwnerKey = variables.ownerKey != "" ? variables.ownerKey : instance.get_Key();
         instance.with( variables.related.get_eagerLoad() );
 
-        return instance.whereIn(
-            instance.get_table() & "." & localOwnerKey,
-            variables.gatherKeysByType( type )
-        ).get();
+        return instance
+            .whereIn(
+                instance.get_table() & "." & localOwnerKey,
+                variables.gatherKeysByType( type )
+            )
+            .get();
     }
 
     public array function gatherKeysByType( required string type ) {
-        return unique( structReduce( variables.dictionary[ arguments.type ], function( acc, key, values ) {
-            arrayAppend( arguments.acc, arguments.values[ 1 ].retrieveAttribute( variables.foreignKey ) );
-            return arguments.acc;
-        }, [] ) );
+        return unique(
+            structReduce(
+                variables.dictionary[ arguments.type ],
+                function( acc, key, values ) {
+                    arrayAppend(
+                        arguments.acc,
+                        arguments.values[ 1 ].retrieveAttribute(
+                            variables.foreignKey
+                        )
+                    );
+                    return arguments.acc;
+                },
+                []
+            )
+        );
     }
 
     public any function createModelByType( required string type ) {
         return variables.wirebox.getInstance( arguments.type );
     }
 
-   public PolymorphicBelongsTo function matchToMorphParents(
-       required string type,
-       required array results
+    public PolymorphicBelongsTo function matchToMorphParents(
+        required string type,
+        required array results
     ) {
         for ( var result in arguments.results ) {
-            var ownerKeyValue = variables.ownerKey != "" ? result.retrieveAttribute( variables.ownerKey ) : result.keyValue();
-            if ( structKeyExists( variables.dictionary[ arguments.type ], ownerKeyValue ) ) {
-                var entities = variables.dictionary[ arguments.type ][ ownerKeyValue ];
+            var ownerKeyValue = variables.ownerKey != "" ? result.retrieveAttribute(
+                variables.ownerKey
+            ) : result.keyValue();
+            if (
+                structKeyExists(
+                    variables.dictionary[ arguments.type ],
+                    ownerKeyValue
+                )
+            ) {
+                var entities = variables.dictionary[ arguments.type ][
+                    ownerKeyValue
+                ];
                 entities.each( function( entity ) {
-                    entity.assignRelationship( variables.relationMethodName, result );
+                    entity.assignRelationship(
+                        variables.relationMethodName,
+                        result
+                    );
                 } );
             }
         }

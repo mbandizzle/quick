@@ -21,11 +21,11 @@ before_install:
   - mysql -e 'CREATE DATABASE quick;'
 install:
   - sudo apt-get update && sudo apt-get --assume-yes install commandbox
-  - box install commandbox-cfconfig
+  - box install commandbox-cfformat,commandbox-cfconfig
   - box install
-before_script:
-  - box server start cfengine=$ENGINE port=8500 debug=true
 script:
+  - box run-script format:check
+  - box server start cfengine=$ENGINE port=8500 debug=true
   - box testbox run runner='http://127.0.0.1:8500/tests/runner.cfm' verbose=false
 after_success:
   - box install commandbox-semantic-release

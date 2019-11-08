@@ -39,13 +39,24 @@ component extends="quick.models.Relationships.BaseRelationship" {
 
     public void function addEagerConstraints( required array entities ) {
         var key = variables.related.get_Table() & "." & variables.ownerKey;
-        variables.related.whereIn( key, variables.getEagerEntityKeys( arguments.entities ) );
+        variables.related.whereIn(
+            key,
+            variables.getEagerEntityKeys( arguments.entities )
+        );
     }
 
     public array function getEagerEntityKeys( required array entities ) {
         return arguments.entities.reduce( function( keys, entity ) {
-            if ( ! isNull( arguments.entity.retrieveAttribute( variables.foreignKey ) ) ) {
-                var key = arguments.entity.retrieveAttribute( variables.foreignKey );
+            if (
+                !isNull(
+                    arguments.entity.retrieveAttribute(
+                        variables.foreignKey
+                    )
+                )
+            ) {
+                var key = arguments.entity.retrieveAttribute(
+                    variables.foreignKey
+                );
                 if ( key != "" ) {
                     arguments.keys.append( key );
                 }
@@ -59,7 +70,10 @@ component extends="quick.models.Relationships.BaseRelationship" {
         required string relation
     ) {
         for ( var entity in arguments.entities ) {
-            entity.assignRelationship( arguments.relation, javacast( "null", "" ) );
+            entity.assignRelationship(
+                arguments.relation,
+                javacast( "null", "" )
+            );
         }
         return arguments.entities;
     }
@@ -70,12 +84,19 @@ component extends="quick.models.Relationships.BaseRelationship" {
         required string relation
     ) {
         var dictionary = arguments.results.reduce( function( dict, result ) {
-            arguments.dict[ arguments.result.retrieveAttribute( variables.ownerKey ) ] = arguments.result;
+            arguments.dict[
+                arguments.result.retrieveAttribute( variables.ownerKey )
+            ] = arguments.result;
             return arguments.dict;
         }, {} );
 
         for ( var entity in arguments.entities ) {
-            if ( structKeyExists( dictionary, entity.retrieveAttribute( variables.foreignKey ) ) ) {
+            if (
+                structKeyExists(
+                    dictionary,
+                    entity.retrieveAttribute( variables.foreignKey )
+                )
+            ) {
                 entity.assignRelationship(
                     arguments.relation,
                     dictionary[ entity.retrieveAttribute( variables.foreignKey ) ]
@@ -91,12 +112,18 @@ component extends="quick.models.Relationships.BaseRelationship" {
     }
 
     public any function associate( required any entity ) {
-        var ownerKeyValue = isSimpleValue( arguments.entity ) ?
-            arguments.entity :
-            arguments.entity.retrieveAttribute( variables.ownerKey );
-        variables.child.forceAssignAttribute( variables.foreignKey, ownerKeyValue );
-        if ( ! isSimpleValue( arguments.entity ) ) {
-            variables.child.assignRelationship( variables.relationMethodName, arguments.entity );
+        var ownerKeyValue = isSimpleValue( arguments.entity ) ? arguments.entity : arguments.entity.retrieveAttribute(
+            variables.ownerKey
+        );
+        variables.child.forceAssignAttribute(
+            variables.foreignKey,
+            ownerKeyValue
+        );
+        if ( !isSimpleValue( arguments.entity ) ) {
+            variables.child.assignRelationship(
+                variables.relationMethodName,
+                arguments.entity
+            );
         }
         return variables.child;
     }
@@ -106,7 +133,9 @@ component extends="quick.models.Relationships.BaseRelationship" {
             name = variables.foreignKey,
             setToNull = true
         );
-        return variables.child.clearRelationship( variables.relationMethodName );
+        return variables.child.clearRelationship(
+            variables.relationMethodName
+        );
     }
 
 }

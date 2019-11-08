@@ -28,7 +28,9 @@ component accessors="true" extends="quick.models.Relationships.BaseRelationship"
     }
 
     public void function addConstraints() {
-        var localValue = variables.farParent.retrieveAttribute( variables.localKey );
+        var localValue = variables.farParent.retrieveAttribute(
+            variables.localKey
+        );
         variables.performJoin();
         variables.related.where(
             variables.getQualifiedFirstKeyName(),
@@ -57,7 +59,9 @@ component accessors="true" extends="quick.models.Relationships.BaseRelationship"
     }
 
     public string function getQualifiedFirstKeyName() {
-        return variables.throughParent.qualifyColumn( variables.firstKey );
+        return variables.throughParent.qualifyColumn(
+            variables.firstKey
+        );
     }
 
     public string function getQualifiedParentKeyName() {
@@ -76,7 +80,9 @@ component accessors="true" extends="quick.models.Relationships.BaseRelationship"
         return entities;
     }
 
-    public HasManyThrough function addEagerConstraints( required array entities ) {
+    public HasManyThrough function addEagerConstraints(
+        required array entities
+    ) {
         variables.performJoin();
         variables.related.whereIn(
             variables.getQualifiedFirstKeyName(),
@@ -104,7 +110,10 @@ component accessors="true" extends="quick.models.Relationships.BaseRelationship"
         for ( var entity in arguments.entities ) {
             var key = entity.retrieveAttribute( variables.localKey );
             if ( structKeyExists( dictionary, key ) ) {
-                entity.assignRelationship( arguments.relation, dictionary[ key ] );
+                entity.assignRelationship(
+                    arguments.relation,
+                    dictionary[ key ]
+                );
             }
         }
         return arguments.entities;
@@ -112,8 +121,10 @@ component accessors="true" extends="quick.models.Relationships.BaseRelationship"
 
     public struct function buildDictionary( required array results ) {
         return arguments.results.reduce( function( dict, result ) {
-            var key = arguments.result.retrieveAttribute( variables.firstKey );
-            if ( ! structKeyExists( arguments.dict, key ) ) {
+            var key = arguments.result.retrieveAttribute(
+                variables.firstKey
+            );
+            if ( !structKeyExists( arguments.dict, key ) ) {
                 arguments.dict[ key ] = [];
             }
             arrayAppend( arguments.dict[ key ], arguments.result );

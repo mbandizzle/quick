@@ -7,9 +7,7 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
                     var user = getInstance( "User" );
                     var service = getWireBox().getInstance(
                         name = "BaseService@quick",
-                        initArguments = {
-                            entity = user
-                        }
+                        initArguments = { entity : user }
                     );
                     expect( service.get_entityName() ).toBe( "User" );
                 } );
@@ -17,9 +15,7 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
                 it( "can be instantiated with a wirebox mapping", function() {
                     var service = getWireBox().getInstance(
                         name = "BaseService@quick",
-                        initArguments = {
-                            entity = "User"
-                        }
+                        initArguments = { entity : "User" }
                     );
                     expect( service.get_entityName() ).toBe( "User" );
                 } );
@@ -34,7 +30,9 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
 
             describe( "retriving records", function() {
                 beforeEach( function() {
-                    variables.service = getWireBox().getInstance( dsl = "quickService:User" );
+                    variables.service = getWireBox().getInstance(
+                        dsl = "quickService:User"
+                    );
                 } );
 
                 afterEach( function() {

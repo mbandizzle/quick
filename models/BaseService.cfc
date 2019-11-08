@@ -10,7 +10,9 @@ component {
 
     public void function onDIComplete() {
         if ( isSimpleValue( variables.entity ) ) {
-            variables.entity = variables.wirebox.getInstance( variables.entity );
+            variables.entity = variables.wirebox.getInstance(
+                variables.entity
+            );
         }
     }
 

@@ -3,7 +3,7 @@ component accessors="true" {
     property name="entity";
 
     public CBORMCriteriaBuilderCompat function init( any entity entity ) {
-        if ( ! isNull( arguments.entity ) ) {
+        if ( !isNull( arguments.entity ) ) {
             variables.entity = arguments.entity;
         }
         return this;
@@ -122,11 +122,15 @@ component accessors="true" {
     }
 
     public CBORMCriteriaBuilderCompat function isNull( required string column ) {
-        variables.entity.retrieveQuery().whereNull( column );
+        variables.entity
+            .retrieveQuery()
+            .whereNull( column );
         return this;
     }
 
-    public CBORMCriteriaBuilderCompat function isNotNull( required string column ) {
+    public CBORMCriteriaBuilderCompat function isNotNull(
+        required string column
+    ) {
         variables.entity
             .retrieveQuery()
             .whereNotNull( arguments.column );
@@ -183,14 +187,18 @@ component accessors="true" {
         return this;
     }
 
-    public CBORMCriteriaBuilderCompat function maxResults( required numeric max ) {
+    public CBORMCriteriaBuilderCompat function maxResults(
+        required numeric max
+    ) {
         variables.entity
             .retrieveQuery()
             .limit( arguments.max );
         return this;
     }
 
-    public CBORMCriteriaBuilderCompat function firstResult( required numeric offset ) {
+    public CBORMCriteriaBuilderCompat function firstResult(
+        required numeric offset
+    ) {
         variables.entity
             .retrieveQuery()
             .offset( arguments.offset );
@@ -198,14 +206,17 @@ component accessors="true" {
     }
 
     public CBORMCriteriaBuilderCompat function order( required any orders ) {
-        arguments.orders = isArray( arguments.orders ) ?
-            arguments.orders :
-            listToArray( arguments.orders, "," );
-        variables.entity.retrieveQuery().orderBy(
-            arguments.orders.map( function( order ) {
-                return replace( arguments.order, " ", "|" );
-            } )
+        arguments.orders = isArray( arguments.orders ) ? arguments.orders : listToArray(
+            arguments.orders,
+            ","
         );
+        variables.entity
+            .retrieveQuery()
+            .orderBy(
+                arguments.orders.map( function( order ) {
+                    return replace( arguments.order, " ", "|" );
+                } )
+            );
         return this;
     }
 
@@ -225,7 +236,11 @@ component accessors="true" {
         required string missingMethodName,
         required struct missingMethodArguments
     ) {
-        invoke( variables.query, arguments.missingMethodName, arguments.missingMethodArguments );
+        invoke(
+            variables.query,
+            arguments.missingMethodName,
+            arguments.missingMethodArguments
+        );
         return this;
     }
 

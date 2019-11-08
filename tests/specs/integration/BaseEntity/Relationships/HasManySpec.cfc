@@ -59,7 +59,8 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
                 var newPostB = getInstance( "Post" );
                 newPostB.setBody( "Another new post by me!" );
                 newPostB.save();
-                expect( newPostB.isLoaded() ).toBeTrue();;
+                expect( newPostB.isLoaded() ).toBeTrue();
+                ;
 
                 var user = getInstance( "User" ).find( 1 );
                 var posts = user.posts().saveMany( [ newPostA.keyValue(), newPostB ] );
@@ -91,12 +92,14 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
             it( "can create new related entities directly", function() {
                 var user = getInstance( "User" ).find( 1 );
                 expect( user.getPosts() ).toHaveLength( 2 );
-                var newPost = user.posts().create( {
-                    "body" = "A new post created directly here!"
-                } );
+                var newPost = user.posts().create( { "body" : "A new post created directly here!" } );
                 expect( newPost.isLoaded() ).toBeTrue();
-                expect( newPost.retrieveAttribute( "user_id" ) ).toBe( user.getId() );
-                expect( newPost.getBody() ).toBe( "A new post created directly here!" );
+                expect( newPost.retrieveAttribute( "user_id" ) ).toBe(
+                    user.getId()
+                );
+                expect( newPost.getBody() ).toBe(
+                    "A new post created directly here!"
+                );
                 expect( user.fresh().getPosts() ).toHaveLength( 3 );
             } );
 

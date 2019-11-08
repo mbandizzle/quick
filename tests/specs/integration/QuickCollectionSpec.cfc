@@ -2,7 +2,9 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
 
     function beforeAll() {
         super.beforeAll();
-        controller.getInterceptorService().registerInterceptor( interceptorObject = this );
+        controller
+            .getInterceptorService()
+            .registerInterceptor( interceptorObject = this );
     }
 
     function run() {
@@ -15,9 +17,12 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
                 var posts = getInstance( "Post" ).get();
                 expect( variables.queries ).toHaveLength( 1 );
                 expectAll( posts ).toSatisfy( function( post ) {
-                    return ! post.isRelationshipLoaded( "author" );
+                    return !post.isRelationshipLoaded( "author" );
                 }, "The relationship should not be loaded." );
-                posts = getInstance( name = "extras.QuickCollection", initArguments = { collection = posts } );
+                posts = getInstance(
+                    name = "extras.QuickCollection",
+                    initArguments = { collection : posts }
+                );
                 posts.load( "author" );
                 expect( variables.queries ).toHaveLength( 2 );
                 expectAll( posts.get() ).toSatisfy( function( post ) {
@@ -27,7 +32,13 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
         } );
     }
 
-    function preQBExecute( event, interceptData, buffer, rc, prc ) {
+    function preQBExecute(
+        event,
+        interceptData,
+        buffer,
+        rc,
+        prc
+    ) {
         arrayAppend( variables.queries, interceptData );
     }
 

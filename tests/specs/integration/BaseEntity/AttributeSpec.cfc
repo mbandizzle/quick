@@ -17,23 +17,32 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
 
             it( "sets attributes using the `setColumnName` magic methods during object creation", function() {
                 var referral = getInstance( "Referral" ).findOrFail( 1 );
-                expect( referral.getType() ).toBeWithCase( "EXTERNAL", "type should be EXTERNAL in all caps thanks to a `setType` method on the `Referral` entity.  Instead got [#referral.getType()#]." );
+                expect( referral.getType() ).toBeWithCase(
+                    "EXTERNAL",
+                    "type should be EXTERNAL in all caps thanks to a `setType` method on the `Referral` entity.  Instead got [#referral.getType()#]."
+                );
             } );
 
             it( "can retrieve the original attributes of a loaded entity", function() {
                 var user = getInstance( "User" ).find( 1 );
                 var originalAttributes = user.retrieveAttributesData();
                 user.setUsername( "new_username" );
-                expect( originalAttributes ).notToBe( user.retrieveAttributesData() );
-                expect( originalAttributes.map( function( key, value ) {
-                    return isNull( value ) ? "" : value;
-                } ) ).toBe( user.get_OriginalAttributes() );
+                expect( originalAttributes ).notToBe(
+                    user.retrieveAttributesData()
+                );
+                expect(
+                    originalAttributes.map( function( key, value ) {
+                        return isNull( value ) ? "" : value;
+                    } )
+                ).toBe( user.get_OriginalAttributes() );
             } );
 
             it( "returns a default value if the attribute is not yet set", function() {
                 var user = getInstance( "User" );
                 expect( user.retrieveAttribute( "username" ) ).toBe( "" );
-                expect( user.retrieveAttribute( "username", "default-value" ) ).toBe( "default-value" );
+                expect( user.retrieveAttribute( "username", "default-value" ) ).toBe(
+                    "default-value"
+                );
             } );
 
             it( "throws an exception when trying to set an attribute that does not exist", function() {
@@ -73,31 +82,31 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
 
             it( "shows all the attributes in the memento of a newly created object", function() {
                 expect( getInstance( "User" ).getMemento() ).toBe( {
-                    "id" = "",
-                    "username" = "",
-                    "firstName" = "",
-                    "lastName" = "",
-                    "password" = "",
-                    "countryId" = "",
-                    "createdDate" = "",
-                    "modifiedDate" = "",
-                    "type" = "",
-                    "email" = ""
+                    "id" : "",
+                    "username" : "",
+                    "firstName" : "",
+                    "lastName" : "",
+                    "password" : "",
+                    "countryId" : "",
+                    "createdDate" : "",
+                    "modifiedDate" : "",
+                    "type" : "",
+                    "email" : ""
                 } );
             } );
 
             it( "shows all the attributes in the component casing", function() {
                 expect( getInstance( "User" ).findOrFail( 1 ).getMemento() ).toBe( {
-                    "id" = 1,
-                    "username" = "elpete",
-                    "firstName" = "Eric",
-                    "lastName" = "Peterson",
-                    "password" = "5F4DCC3B5AA765D61D8327DEB882CF99",
-                    "countryId" = "02B84D66-0AA0-F7FB-1F71AFC954843861",
-                    "createdDate" = "2017-07-28 02:06:36",
-                    "modifiedDate" = "2017-07-28 02:06:36",
-                    "type" = "admin",
-                    "email" = ""
+                    "id" : 1,
+                    "username" : "elpete",
+                    "firstName" : "Eric",
+                    "lastName" : "Peterson",
+                    "password" : "5F4DCC3B5AA765D61D8327DEB882CF99",
+                    "countryId" : "02B84D66-0AA0-F7FB-1F71AFC954843861",
+                    "createdDate" : "2017-07-28 02:06:36",
+                    "modifiedDate" : "2017-07-28 02:06:36",
+                    "type" : "admin",
+                    "email" : ""
                 } );
             } );
         } );

@@ -22,7 +22,7 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
 
             it( "throws about unloaded entities when calling `update`", function() {
                 expect( function() {
-                    getInstance( "User" ).update( { "username": "johndoe" } );
+                    getInstance( "User" ).update( { "username" : "johndoe" } );
                 } ).toThrow(
                     type = "QuickEntityNotLoaded",
                     regex = "This instance is not loaded so it cannot be updated\.  Did you maybe mean to use `updateAll`, `insert`, or `save`\?"

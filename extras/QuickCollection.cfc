@@ -9,7 +9,7 @@ component extends="cfcollection.models.Collection" {
             return this;
         }
 
-        if ( ! isArray( arguments.relationName ) ) {
+        if ( !isArray( arguments.relationName ) ) {
             arguments.relationName = [ arguments.relationName ];
         }
 
@@ -21,16 +21,20 @@ component extends="cfcollection.models.Collection" {
     }
 
     public array function getMemento() {
-        return this.map( function( entity ) {
-            return arguments.entity.$renderData();
-        } ).get();
+        return this
+            .map( function( entity ) {
+                return arguments.entity.$renderData();
+            } )
+            .get();
     }
 
     public array function $renderData() {
         return variables.getMemento();
     }
 
-    private QuickCollection function eagerLoadRelation( required string relationName ) {
+    private QuickCollection function eagerLoadRelation(
+        required string relationName
+    ) {
         var relation = invoke( variables.get( 1 ), arguments.relationName ).resetQuery();
         relation.addEagerConstraints( variables.get() );
         variables.collection = relation.match(

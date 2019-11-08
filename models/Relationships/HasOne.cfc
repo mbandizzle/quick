@@ -9,7 +9,10 @@ component extends="quick.models.Relationships.HasOneOrMany" {
         required string relation
     ) {
         for ( var entity in arguments.entities ) {
-            entity.assignRelationship( arguments.relation, javacast( "null", "" ) );
+            entity.assignRelationship(
+                arguments.relation,
+                javacast( "null", "" )
+            );
         }
         return entities;
     }

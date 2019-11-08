@@ -2,7 +2,9 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
 
     function beforeAll() {
         super.beforeAll();
-        var interceptorService = getWireBox().getInstance( dsl = "coldbox:interceptorService" );
+        var interceptorService = getWireBox().getInstance(
+            dsl = "coldbox:interceptorService"
+        );
         interceptorService.registerInterceptor( interceptorObject = this );
     }
 
@@ -34,7 +36,13 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
         } );
     }
 
-    function quickPreLoad( event, interceptData, buffer, rc, prc ) {
+    function quickPreLoad(
+        event,
+        interceptData,
+        buffer,
+        rc,
+        prc
+    ) {
         variables.quickPreLoadCalled = arguments.interceptData;
     }
 
