@@ -195,14 +195,24 @@ component
     }
 
     /**
+     * Get the key to compare in the existence query.
+     *
+     * @return  String
+     */
+    public string function getExistenceCompareKey() {
+        return getQualifiedForeignKeyName();
+    }
+
+    /**
      * Associates the given entity when the relationship is used as a setter.
      *
      * Relationships on entities can be called with `set` in front of it.
      * If it is, a `HasOne` or `HasMany` relationship forwards the call to `saveMany`.
      *
-     * @entities
+     * @entities      An array of entities to set.
      *
-     * @return    quick.models.BaseEntity
+     * @doc_abstract  quick.models.BaseEntity
+     * @return        [quick.models.BaseEntity]
      */
     public array function applySetter() {
         variables.related.updateAll(

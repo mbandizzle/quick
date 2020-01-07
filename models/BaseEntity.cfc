@@ -237,6 +237,8 @@ component accessors="true" {
 
     /**
      * Returns the name for this entity.
+     *
+     * @return  String
      */
     public string function entityName() {
         return variables._entityName;
@@ -244,9 +246,20 @@ component accessors="true" {
 
     /**
      * Returns the table name for this entity.
+     *
+     * @return  String
      */
     public string function tableName() {
         return variables._table;
+    }
+
+    /**
+     * Returns the qualified key name for this entity.
+     *
+     * @return  String
+     */
+    public string function retrieveQualifiedKeyName() {
+        return variables._table & "." & variables._key;
     }
 
     /**
@@ -1257,6 +1270,11 @@ component accessors="true" {
     /*=====================================
     =          Relationship Types         =
     =====================================*/
+    public any function has( required string relationshipName ) {
+        var relation = invoke( this, relationshipName );
+        retrieveQuery().whereExists( relation.getRelationExistenceQuery() );
+        return this;
+    }
 
     /**
      * Returns a BelongsTo relationship between this entity and the entity

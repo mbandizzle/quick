@@ -151,6 +151,31 @@ component {
     }
 
     /**
+     * Gets the query used to check for relation existance.
+     *
+     * @return  qb.models.Query.QueryBuilder
+     */
+    public QueryBuilder function getRelationExistenceQuery() {
+        return variables.related
+            .newQuery()
+            .selectRaw( 1 )
+            .whereColumn(
+                getQualifiedLocalKey(),
+                "=",
+                getExistenceCompareKey()
+            );
+    }
+
+    /**
+     * Returns the fully-qualified local key.
+     *
+     * @return  String
+     */
+    public string function getQualifiedLocalKey() {
+        return variables.parent.retrieveQualifiedKeyName();
+    }
+
+    /**
      * Forwards missing method calls on to the related entity.
      *
      * @missingMethodName       The missing method name.
@@ -158,16 +183,12 @@ component {
      *
      * @return                  any
      */
-    public any function onMissingMethod(
-        required string missingMethodName,
-        required struct missingMethodArguments
-    ) {
+    function onMissingMethod( missingMethodName, missingMethodArguments ) {
         var result = invoke(
             variables.related,
-            arguments.missingMethodName,
-            arguments.missingMethodArguments
+            missingMethodName,
+            missingMethodArguments
         );
-
         if ( isSimpleValue( result ) ) {
             return result;
         }
