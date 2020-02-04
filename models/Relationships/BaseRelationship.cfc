@@ -155,10 +155,7 @@ component {
      *
      * @return  qb.models.Query.QueryBuilder
      */
-    public QueryBuilder function getRelationExistenceQuery(
-        string operator,
-        numeric count
-    ) {
+    public QueryBuilder function getRelationExistenceQuery( any callback ) {
         return variables.related
             .newQuery()
             .selectRaw( 1 )
@@ -166,12 +163,6 @@ component {
                 getQualifiedLocalKey(),
                 "=",
                 getExistenceCompareKey()
-            )
-            .when(
-                ! isNull( arguments.operator ) && ! isNull( arguments.count ),
-                function( q ) {
-                    q.having( q.raw( "COUNT(*)" ), operator, count );
-                }
             );
     }
 
