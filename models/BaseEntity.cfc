@@ -1270,9 +1270,12 @@ component accessors="true" {
     /*=====================================
     =          Relationship Types         =
     =====================================*/
-    public any function has( required string relationshipName ) {
-        var relation = invoke( this, relationshipName );
-        retrieveQuery().whereExists( relation.getRelationExistenceQuery() );
+    public any function has( required string relationshipName, string operator, numeric count ) {
+        var relation = invoke( this, arguments.relationshipName );
+        structDelete( arguments, "relationshipName" );
+        retrieveQuery().whereExists(
+            relation.getRelationExistenceQuery( argumentCollection = arguments )
+        );
         return this;
     }
 
