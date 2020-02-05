@@ -1299,18 +1299,18 @@ component accessors="true" {
                 "."
             );
 
-            retrieveQuery().whereExists(
-                hasNested( argumentCollection = arguments )
-            );
+            invoke( retrieveQuery(), "whereExists", {
+                "query": hasNested( argumentCollection = arguments )
+            } );
 
             return this;
         }
 
-        retrieveQuery().whereExists(
-            arguments.relationQuery.when( !isNull( arguments.operator ) && !isNull( arguments.count ), function( q ) {
+        invoke( retrieveQuery(), "whereExists", {
+            "query": arguments.relationQuery.when( !isNull( arguments.operator ) && !isNull( arguments.count ), function( q ) {
                 q.having( q.raw( "COUNT(*)" ), operator, count );
             } )
-        );
+        } );
         return this;
     }
 
@@ -1326,8 +1326,8 @@ component accessors="true" {
         );
 
         if ( listLen( arguments.relationshipName, "." ) == 1 ) {
-            return arguments.relationQuery.whereExists(
-                relation
+            return invoke( arguments.relationQuery, "whereExists", {
+                "query": relation
                     .getRelationExistenceQuery( relation.getRelated() )
                     .when(
                         !isNull( arguments.operator ) && !isNull(
@@ -1337,12 +1337,12 @@ component accessors="true" {
                             q.having( q.raw( "COUNT(*)" ), operator, count );
                         }
                     )
-            );
+            } );
         }
 
-        arguments.relationQuery = arguments.relationQuery.whereExists(
-            relation.getRelationExistenceQuery( relation.getRelated() )
-        );
+        arguments.relationQuery = invoke( arguments.relationQuery, "whereExists", {
+            "query": relation.getRelationExistenceQuery( relation.getRelated() )
+        } );
 
         return hasNested( argumentCollection = arguments );
     }
@@ -1379,23 +1379,23 @@ component accessors="true" {
                 "."
             );
 
-            retrieveQuery().whereExists(
-                whereHasNested( argumentCollection = arguments )
-            );
+            invoke( retrieveQuery(), "whereExists", {
+                "query": whereHasNested( argumentCollection = arguments )
+            } );
 
             return this;
         }
 
-        retrieveQuery().whereExists(
-            arguments.relationQuery
+        invoke( retrieveQuery(), "whereExists", {
+            "query": arguments.relationQuery
                 .when( !isNull( callback ), function( q ) {
                     callback( q );
                 } )
                 .when( !isNull( arguments.operator ) && !isNull( arguments.count ), function( q ) {
                     q.having( q.raw( "COUNT(*)" ), operator, count );
                 } ),
-            arguments.combinator
-        );
+            "combinator": arguments.combinator
+        } );
         return this;
     }
 
@@ -1410,8 +1410,8 @@ component accessors="true" {
         );
 
         if ( listLen( arguments.relationshipName, "." ) == 1 ) {
-            return arguments.relationQuery.whereExists(
-                relation
+            return invoke( arguments.relationQuery, "whereExists", {
+                "query": relation
                     .getRelationExistenceQuery( relation.getRelated() )
                     .when( !isNull( callback ), function( q ) {
                         callback( q );
@@ -1424,12 +1424,12 @@ component accessors="true" {
                             q.having( q.raw( "COUNT(*)" ), operator, count );
                         }
                     )
-            );
+            } );
         }
 
-        arguments.relationQuery = arguments.relationQuery.whereExists(
-            relation.getRelationExistenceQuery( relation.getRelated() )
-        );
+        arguments.relationQuery = invoke( arguments.relationQuery, "whereExists", {
+            "query": relation.getRelationExistenceQuery( relation.getRelated() )
+        } );
 
         return whereHasNested( argumentCollection = arguments );
     }
