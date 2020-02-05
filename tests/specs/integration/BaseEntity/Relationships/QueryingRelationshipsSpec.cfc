@@ -147,7 +147,7 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
                         expect( users ).toHaveLength( 2 );
                     } );
 
-                    xit( "can constrain the count of the doesntHave check", function() {
+                    it( "can constrain the count of the doesntHave check", function() {
                         var users = getInstance( "User" ).doesntHave( "posts", ">=", 2 ).get();
                         expect( users ).toBeArray();
                         expect( users ).toHaveLength( 3 );
@@ -157,33 +157,33 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
                         expect( users ).toHaveLength( 3 );
                     } );
 
-                    xit( "can constrain a has query using whereHas", function() {
+                    it( "can constrain a has query using whereDoesntHave", function() {
                         var users = getInstance( "User" )
-                            .whereHas( "posts", function( q ) {
+                            .whereDoesntHave( "posts", function( q ) {
                                 q.where( "body", "like", "%different%" );
                             } )
                             .get();
                         expect( users ).toBeArray();
-                        expect( users ).toHaveLength( 1 );
+                        expect( users ).toHaveLength( 3 );
                     } );
 
-                    xit( "can constrain a has query using whereHas and orWhereHas", function() {
+                    it( "can constrain a has query using whereDoesntHave and orWhereDoesntHave", function() {
                         var users = getInstance( "User" )
-                            .whereHas( "posts", function( q ) {
+                            .whereDoesntHave( "posts", function( q ) {
                                 q.where( "body", "like", "%different%" );
                             } )
-                            .orWhereHas( "posts", function( q ) {
+                            .orWhereDoesntHave( "posts", function( q ) {
                                 q.where( "body", "like", "%awesome%" );
                             } )
                             .get();
                         expect( users ).toBeArray();
-                        expect( users ).toHaveLength( 2 );
+                        expect( users ).toHaveLength( 4 );
                     } );
 
-                    xit( "can check nested relationships for existence", function() {
-                        var users = getInstance( "User" ).has( "posts.comments" ).get();
+                    it( "can check nested relationships for absence", function() {
+                        var users = getInstance( "User" ).doesntHave( "posts.comments" ).get();
                         expect( users ).toBeArray();
-                        expect( users ).toHaveLength( 1 );
+                        expect( users ).toHaveLength( 3 );
                     } );
 
                     xit( "applies count constraints to the final relationship in a nested relationsihp existence check", function() {
