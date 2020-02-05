@@ -153,17 +153,15 @@ component {
     /**
      * Gets the query used to check for relation existance.
      *
-     * @return  qb.models.Query.QueryBuilder
+     * @base    The base entity for the query.
+     *
+     * @return  quick.models.BaseEntity | qb.models.Query.QueryBuilder
      */
-    public QueryBuilder function getRelationExistenceQuery( any callback ) {
-        return variables.related
+    public any function getRelationExistenceQuery( required any base ) {
+        return arguments.base
             .newQuery()
             .selectRaw( 1 )
-            .whereColumn(
-                getQualifiedLocalKey(),
-                "=",
-                getExistenceCompareKey()
-            );
+            .whereColumn( getQualifiedLocalKey(), getExistenceCompareKey() );
     }
 
     /**
@@ -173,6 +171,22 @@ component {
      */
     public string function getQualifiedLocalKey() {
         return variables.parent.retrieveQualifiedKeyName();
+    }
+
+    /**
+     * Get the key to compare in the existence query.
+     *
+     * @return  String
+     */
+    public string function getExistenceCompareKey() {
+        return getQualifiedForeignKeyName();
+    }
+
+    /**
+     * Returns the related entity for the relationship.
+     */
+    public any function getRelated() {
+        return variables.related;
     }
 
     /**
@@ -209,6 +223,20 @@ component {
             createObject( "java", "java.util.HashSet" ).init( arguments.items ).toArray(),
             1
         );
+    }
+
+    /**
+     * Calls the callback with the given value and then returns the given value.
+     * Nice to avoid temporary variables.
+     *
+     * @value     The value to pass to the callback and as the return value.
+     * @callback  The callback to execute.
+     *
+     * @return    any
+     */
+    private any function tap( required any value, required any callback ) {
+        arguments.callback( arguments.value );
+        return arguments.value;
     }
 
 }

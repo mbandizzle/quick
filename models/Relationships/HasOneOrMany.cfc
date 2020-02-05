@@ -195,15 +195,6 @@ component
     }
 
     /**
-     * Get the key to compare in the existence query.
-     *
-     * @return  String
-     */
-    public string function getExistenceCompareKey() {
-        return getQualifiedForeignKeyName();
-    }
-
-    /**
      * Associates the given entity when the relationship is used as a setter.
      *
      * Relationships on entities can be called with `set` in front of it.

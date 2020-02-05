@@ -1289,7 +1289,9 @@ component accessors="true" {
             this,
             listFirst( arguments.relationshipName, "." )
         );
-        arguments.relationQuery = relation.getRelationExistenceQuery();
+        arguments.relationQuery = relation.getRelationExistenceQuery(
+            relation.getRelated()
+        );
 
         if ( listLen( arguments.relationshipName, "." ) > 1 ) {
             arguments.relationshipName = listRest(
@@ -1326,7 +1328,7 @@ component accessors="true" {
         if ( listLen( arguments.relationshipName, "." ) == 1 ) {
             return arguments.relationQuery.whereExists(
                 relation
-                    .getRelationExistenceQuery()
+                    .getRelationExistenceQuery( relation.getRelated() )
                     .when(
                         !isNull( arguments.operator ) && !isNull(
                             arguments.count
@@ -1339,7 +1341,7 @@ component accessors="true" {
         }
 
         arguments.relationQuery = arguments.relationQuery.whereExists(
-            relation.getRelationExistenceQuery()
+            relation.getRelationExistenceQuery( relation.getRelated() )
         );
 
         return hasNested( argumentCollection = arguments );
@@ -1367,7 +1369,9 @@ component accessors="true" {
             this,
             listFirst( arguments.relationshipName, "." )
         );
-        arguments.relationQuery = relation.getRelationExistenceQuery();
+        arguments.relationQuery = relation.getRelationExistenceQuery(
+            relation.getRelated()
+        );
 
         if ( listLen( arguments.relationshipName, "." ) > 1 ) {
             arguments.relationshipName = listRest(
@@ -1408,7 +1412,7 @@ component accessors="true" {
         if ( listLen( arguments.relationshipName, "." ) == 1 ) {
             return arguments.relationQuery.whereExists(
                 relation
-                    .getRelationExistenceQuery()
+                    .getRelationExistenceQuery( relation.getRelated() )
                     .when( !isNull( callback ), function( q ) {
                         callback( q );
                     } )
@@ -1424,7 +1428,7 @@ component accessors="true" {
         }
 
         arguments.relationQuery = arguments.relationQuery.whereExists(
-            relation.getRelationExistenceQuery()
+            relation.getRelationExistenceQuery( relation.getRelated() )
         );
 
         return whereHasNested( argumentCollection = arguments );
