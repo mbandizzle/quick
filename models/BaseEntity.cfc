@@ -1359,6 +1359,8 @@ component accessors="true" {
     public any function whereHas(
         required string relationshipName,
         any callback,
+        any operator,
+        any count,
         string combinator = "and"
     ) {
         var relation = invoke(
@@ -1381,9 +1383,13 @@ component accessors="true" {
         }
 
         retrieveQuery().whereExists(
-            arguments.relationQuery.when( !isNull( callback ), function( q ) {
-                callback( q );
-            } ),
+            arguments.relationQuery
+                .when( !isNull( callback ), function( q ) {
+                    callback( q );
+                } )
+                .when( !isNull( arguments.operator ) && !isNull( arguments.count ), function( q ) {
+                    q.having( q.raw( "COUNT(*)" ), operator, count );
+                } ),
             arguments.combinator
         );
         return this;
@@ -1406,6 +1412,14 @@ component accessors="true" {
                     .when( !isNull( callback ), function( q ) {
                         callback( q );
                     } )
+                    .when(
+                        !isNull( arguments.operator ) && !isNull(
+                            arguments.count
+                        ),
+                        function( q ) {
+                            q.having( q.raw( "COUNT(*)" ), operator, count );
+                        }
+                    )
             );
         }
 

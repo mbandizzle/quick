@@ -71,6 +71,37 @@ component extends="tests.resources.ModuleIntegrationSpec" appMapping="/app" {
                 expect( users ).toBeArray();
                 expect( users ).toHaveLength( 1 );
             } );
+
+            it( "can apply counts to a whereHas constraint", function() {
+                var users = getInstance( "User" )
+                    .whereHas(
+                        "posts",
+                        function( q ) {
+                            q.where( "body", "like", "%different%" );
+                        },
+                        ">",
+                        3
+                    )
+                    .get();
+                expect( users ).toBeArray();
+                expect( users ).toBeEmpty();
+            } );
+
+            it( "can apply counts to nested whereHas constraint", function() {
+                var users = getInstance( "User" )
+                    .whereHas(
+                        "posts.comments",
+                        function( q ) {
+                            q.where( "body", "like", "%great%" );
+                        },
+                        ">",
+                        3
+                    )
+                    .get();
+
+                expect( users ).toBeArray();
+                expect( users ).toBeEmpty();
+            } );
         } );
     }
 
